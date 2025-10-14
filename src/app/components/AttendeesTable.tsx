@@ -1,0 +1,61 @@
+interface Attendee {
+  name: string;
+  tour: string;
+  groupLevel: string;
+}
+
+export default function AttendeesTable({ attendeesList }: { attendeesList: string[] }) {
+
+  const attendees: Attendee[] = (attendeesList || [])
+    .map((entry) => {
+      try {
+        return JSON.parse(entry);
+      } catch {
+        return { name: entry, tour: "", groupLevel: "" };
+      }
+    })
+    .sort((a, b) => {
+      // Primary sort: Compare by groupLevel.
+      const groupCompare = a.groupLevel.localeCompare(b.groupLevel);
+      if (groupCompare !== 0) {
+        return groupCompare;
+      }
+      // Secondary sort: If groupLevels are the same, compare by tour.
+      return a.tour.localeCompare(b.tour);
+    });
+
+  return (
+    <div className="mt-8 w-full md:w-4/5 mx-auto">
+      <h2 className="text-lg font-semibold mb-4 text-center">Participants</h2>
+      <div className="overflow-x-auto">
+        <table className="table table-zebra md:table-lg rounded-box bg-base-200 shadow-md w-full">
+          <thead>
+            <tr>
+              <th className="text-base font-semibold py-1">Nom</th>
+              <th className="text-base font-semibold text-center py-1">Groupe</th>
+              <th className="text-base font-semibold text-center py-1">Tour</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attendees.length === 0 && (
+              <tr>
+                <td colSpan={3} className="text-center">Aucun participant pour le moment.</td>
+              </tr>
+            )}
+            {attendees.map((att, idx) => (
+              <tr key={idx}>
+                <td  className="font-medium py-1">{att.name}</td>
+                  <td className="text-center py-1">
+                    <span className="badge badge-info badge-outline">{att.groupLevel}</span>
+                  </td>
+                  <td className="text-center py-1">
+                    <span className="badge badge-success badge-outline">{att.tour}</span>
+                  </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

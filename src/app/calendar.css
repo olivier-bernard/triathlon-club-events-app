@@ -1,0 +1,45 @@
+/* Override default react-calendar styles to be theme-friendly */
+.react-calendar {
+  @apply w-full border-none bg-base-200 p-2 rounded-box;
+}
+
+/* Style for the navigation bar (month, year, arrows) */
+.react-calendar__navigation {
+  @apply flex justify-between items-center mb-4;
+}
+
+.react-calendar__navigation button {
+  @apply btn btn-ghost btn-sm;
+}
+
+/* Style for the main calendar view */
+.react-calendar__month-view__weekdays {
+  @apply text-center font-bold text-base-content uppercase;
+}
+
+/* This is the key part: give each day a minimum height and box look */
+.react-calendar__month-view__days__day {
+  @apply min-h-[120px] border border-base-300 p-1;
+}
+
+/* Style for the individual day tiles */
+.react-calendar__tile {
+  @apply flex flex-col items-start text-left align-top h-full;
+  background: none; /* Remove default background */
+}
+
+/* Hover and active states */
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  @apply bg-base-300 rounded-lg;
+}
+
+/* Style for days outside the current month */
+.react-calendar__month-view__days__day--neighboringMonth {
+  @apply text-opacity-50;
+}
+
+/* Style for the current day */
+.react-calendar__tile--now {
+  @apply bg-base-300 rounded-lg;
+}
