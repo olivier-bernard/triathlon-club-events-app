@@ -13,7 +13,6 @@ interface EventDetailPageProps {
 export default async function EventDetail({ params }: EventDetailPageProps) {
   const inputParams = await params;
   const event: EventWithRegistrations | null = await getEventById(inputParams.id);
-  console.log("Event content fetched : ", event);
 
   if (!event) {
     return notFound();
