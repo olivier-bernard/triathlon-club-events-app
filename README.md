@@ -7,9 +7,10 @@ This is a Next.js application designed to manage and display cycling training ev
 - **Event Listing**: Users can view a list of cycling training events with details such as date, activity, number of attendees, time, event name, and distance options.
 - **Event Details**: Users can click on an event to view more details, including characteristics and available distances.
 - **User Registration**: Users can register for events through a dedicated registration form.
+- **Future user authentication**: The application is prepared for future integration for user authentication and management, using google / Microsoft / apple ID. Maybe there will need an approval flow to validate new users,
+- **Future management of events**: the users can register on events, this will be a way to add events with the possibility to let users to create events where the coach will approve. Csv ingestion for coachs, cleanup of previous events. Same way, let coach add/update the content of the workout + update the track. 
 - **Server-Side Rendering**: The application utilizes server-side rendering for improved performance and SEO.
 - **Database Integration**: The application connects to a database using an ORM (Prisma) to manage event data and user registrations.
-- **Future oauth Integration**: The application is prepared for future integration for user authentication and management.
 
 ## Getting Started
 
