@@ -20,14 +20,14 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
 
   return (
     <>
-      <div className="container mx-auto px-1 py-1 md:p-8">
-        <div className="mb-4">
+      <div className="container mx-auto p-1 md:p-8">
+        <div className="mb-2">
           <Link href="/events" className="btn btn-outline btn-secondary rounded-box">
             ← Retour à la liste des événements
           </Link>
         </div>
 
-        <div className="bg-base-200 rounded-box shadow-md p-6 mb-6">
+        <div className="bg-base-200 rounded-box shadow-md pt-1 pb-1 px-6 mb-4">
           <h1 className="text-xl font-bold">{event.activity}</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-base">
             <p>Date: {new Date(event.date).toLocaleDateString()}</p>
@@ -44,9 +44,9 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
 
         {/* Conditionally display the 'seance' field */}
         {event.seance && (
-          <div className="bg-base-200 rounded-box shadow-md p-6 mb-6">
-            <div className="mt-4">
-              <h2 className="text-lg font-semibold mb-2">Séance du jour :</h2>
+          <div className="bg-base-200 rounded-box shadow-md pt-1 pb-1 px-6 mb-2">
+            <div className="mt-2">
+              <h2 className="text-lg font-semibold mb-1">Séance du jour :</h2>
               {/* whitespace-pre-line preserves line breaks from your data */}
               <p className="whitespace-pre-line p-4 rounded-box">
                 {event.seance}
