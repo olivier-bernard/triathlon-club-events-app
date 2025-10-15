@@ -11,12 +11,12 @@ interface AttendeesTableProps {
 
 export default function AttendeesTable({ attendeesList, onDelete }: AttendeesTableProps) {
 
-  const attendees: Attendee[] = (attendeesList || [])
-    .map((entry) => {
+  const attendees: (Attendee & { originalIdx: number })[] = (attendeesList || [])
+    .map((entry, originalIdx) => {
       try {
-        return JSON.parse(entry);
+        return { ...JSON.parse(entry), originalIdx };
       } catch {
-        return { name: entry, tour: "", groupLevel: "" };
+        return { name: entry, tour: "", groupLevel: "", originalIdx };
       }
     })
     .sort((a, b) => {
@@ -41,6 +41,7 @@ export default function AttendeesTable({ attendeesList, onDelete }: AttendeesTab
               <th className="text-base font-semibold py-0">Nom</th>
               <th className="text-base font-semibold text-center py-0">Groupe</th>
               <th className="text-base font-semibold text-center py-0">Tour</th>
+              <th className="text-base font-semibold text-center py-0"> </th>
             </tr>
           </thead>
           <tbody>
@@ -51,20 +52,20 @@ export default function AttendeesTable({ attendeesList, onDelete }: AttendeesTab
             )}
             {attendees.map((att, idx) => (
               <tr key={idx}>
-                <td className="font-medium py-0">{att.name}</td>
-                <td className="text-center py-0">
+                <td className="font-medium py-1">{att.name}</td>
+                <td className="text-center py-1">
                   <span className="badge badge-info badge-outline">{att.groupLevel}</span>
                 </td>
-                <td className="text-center py-0">
+                <td className="text-center py-1">
                   <span className="badge badge-success badge-outline">{att.tour}</span>
                 </td>
-                <td className="text-center py-0">
+                <td className="text-center py-1">
                   {onDelete && (
                     <button
                       type="button"
                       className="text-error hover:text-red-700 text-lg px-1"
                       title="Supprimer"
-                      onClick={() => onDelete(idx)}
+                      onClick={() => onDelete(att.originalIdx)}
                     >
                       &#10060;
                     </button>

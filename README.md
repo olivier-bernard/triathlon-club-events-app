@@ -35,5 +35,6 @@ This is a Next.js application designed to manage and display cycling training ev
 
 ## Future Enhancements
 
-- Integrate Keycloak for user authentication and management.
-- Implement additional features such as event filtering and user profiles.
+- Integrate user authentication and management.
+- Implement additional features such as event filtering and user profile to enable autorized users to create events,
+- Event creation and delete, using either the interface or a csv like ingestion. TBD depending on users feedback
