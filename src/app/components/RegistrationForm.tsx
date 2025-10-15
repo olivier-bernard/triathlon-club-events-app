@@ -68,7 +68,7 @@ export default function RegistrationForm({ eventId, distanceOptions, groupLevels
       </select>
       <button
         type="submit"
-        className="btn btn-primary rounded-box"
+        className="btn btn-primary font-bold py-2 px-4 rounded-lg hover:bg-primary-focus"
       >
         S'enregistrer
       </button>

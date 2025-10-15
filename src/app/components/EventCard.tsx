@@ -20,7 +20,7 @@ const EventCard: React.FC<{ event: Event }> = ({ event }) => {
   return (
     <Link
       href={`/events/${event.id}`}
-      className="block bg-base-100 rounded-2xl shadow-xl p-2 md:p-5 transition-transform hover:scale-105 hover:shadow-2xl border border-base-200 cursor-pointer"
+      className="block bg-base-100 rounded-2xl shadow-xl p-2 md:p-5 transition-transform hover:scale-105 hover:shadow-2xl  border-base-200 cursor-pointer"
     >
       {/* First row: date, time, activity */}
       <div className="flex flex-wrap items-center justify-between text-base-content text-sm mb-2">

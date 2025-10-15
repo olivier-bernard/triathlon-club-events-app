@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getEventById } from "@/app/lib/queries/events";
 import RegistrationForm from "@/app/components/RegistrationForm";
-import AttendeesTable from "@/app/components/AttendeesTable";
+import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import Link from "next/link";
 import { EventWithRegistrations } from "@/app/lib/types"; // <-- Import the new type
 
@@ -22,7 +22,7 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
     <>
       <div className="container mx-auto p-1 md:p-8">
         <div className="mb-2">
-          <Link href="/events" className="btn btn-outline btn-secondary rounded-box">
+          <Link href="/events" className="btn btn-primary rounded-box">
             ← Retour à la liste des événements
           </Link>
         </div>
@@ -90,8 +90,9 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
             groupLevels={event.groupLevels || ["1", "2", "3"]}
           />
         </div>
-        <AttendeesTable
-          attendeesList={event.attendeesList}
+        <AttendeesTableClient
+          eventId={event.id}
+          initialAttendeesList={event.attendeesList}
         />
       </div>
     </>

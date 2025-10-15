@@ -1,45 +1,77 @@
 /* Override default react-calendar styles to be theme-friendly */
 .react-calendar {
-  @apply w-full border-none bg-base-200 p-2 rounded-box;
+  width: 100%;
+  border: none;
+  padding: 0.5rem;                /* p-2 */
+  border-radius: var(--rounded-box);
+  background-color: hsl(var(--b2)); /* base-200 */
+  color: hsl(var(--bc));            /* base-content */
 }
 
-/* Style for the navigation bar (month, year, arrows) */
+/* Navigation (month/year + arrows) */
 .react-calendar__navigation {
-  @apply flex justify-between items-center mb-4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;             /* mb-4 */
 }
 
 .react-calendar__navigation button {
-  @apply btn btn-ghost btn-sm;
+  /* Approximate DaisyUI btn-ghost btn-sm */
+  border: 1px solid transparent;
+  background: transparent;
+  color: hsl(var(--bc));
+  border-radius: var(--rounded-btn);
+  padding: 0.25rem 0.5rem;         /* ~ btn-sm */
+  height: 2rem;
+  line-height: 1;
+  font-weight: 600;
+}
+.react-calendar__navigation button:hover:enabled,
+.react-calendar__navigation button:focus:enabled {
+  background-color: hsl(var(--b3)); /* base-300 hover */
 }
 
-/* Style for the main calendar view */
+/* Weekday headings */
 .react-calendar__month-view__weekdays {
-  @apply text-center font-bold text-base-content uppercase;
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: hsl(var(--bc));
 }
 
-/* This is the key part: give each day a minimum height and box look */
+/* Day cells */
 .react-calendar__month-view__days__day {
-  @apply min-h-[120px] border border-base-300 p-1;
+  min-height: 120px;
+  border: 1px solid hsl(var(--b3)); /* base-300 */
+  padding: 0.25rem;                 /* p-1 */
 }
 
-/* Style for the individual day tiles */
+/* Day tile layout */
 .react-calendar__tile {
-  @apply flex flex-col items-start text-left align-top h-full;
-  background: none; /* Remove default background */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  vertical-align: top;
+  height: 100%;
+  background: none;
 }
 
-/* Hover and active states */
+/* Hover/active states */
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
-  @apply bg-base-300 rounded-lg;
+  background-color: hsl(var(--b3)); /* base-300 */
+  border-radius: 0.5rem;            /* ~ rounded-lg */
 }
 
-/* Style for days outside the current month */
+/* Days outside current month */
 .react-calendar__month-view__days__day--neighboringMonth {
-  @apply text-opacity-50;
+  opacity: 0.5;                     /* ~ text-opacity-50 */
 }
 
-/* Style for the current day */
+/* Today */
 .react-calendar__tile--now {
-  @apply bg-base-300 rounded-lg;
+  background-color: hsl(var(--b3)); /* base-300 */
+  border-radius: 0.5rem;
 }

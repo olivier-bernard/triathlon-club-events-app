@@ -110,6 +110,7 @@ export async function deleteEvent(eventId: string) {
     where: { id: eventId },
   });
 }
+
 export async function updateEvent(eventId: string, data: Partial<{
   activity: string;
   date: Date;
@@ -120,6 +121,8 @@ export async function updateEvent(eventId: string, data: Partial<{
   description: string;
   location: string;
   attendeesLimit: number;
+  attendeesList: string[];
+  attendees: number;
 }>) {
   return db.event.update({
     where: { id: eventId },

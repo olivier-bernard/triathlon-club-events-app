@@ -1,5 +1,6 @@
 "use server";
 import { db } from "@/app/lib/db";
+import { updateEvent } from "@/app/lib/queries/events";
 
 export async function registerForEvent(eventId: string, name: string, tour: string, groupLevel: string) {
   if (!eventId || !name) throw new Error("Missing fields");
@@ -11,5 +12,12 @@ export async function registerForEvent(eventId: string, name: string, tour: stri
       attendeesList: { push: attendeeInfo },
       attendees: { increment: 1 },
     },
+  });
+}
+
+export async function handleDelete(eventId: string, updatedAttendeesList: string[]) {
+  await updateEvent(eventId, {
+    attendeesList: updatedAttendeesList,
+    attendees: updatedAttendeesList.length,
   });
 }
