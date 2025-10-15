@@ -42,7 +42,7 @@
 
 /* Day cells */
 .react-calendar__month-view__days__day {
-  min-height: 120px;
+  min-height: 100px;
   border: 1px solid hsl(var(--b3)); /* base-300 */
   padding: 0.25rem;                 /* p-1 */
 }
