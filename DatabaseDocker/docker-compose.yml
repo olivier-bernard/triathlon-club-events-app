@@ -1,0 +1,28 @@
+
+services:
+  postgres:
+   #  image: ${POSTGRES_IMAGE}
+    image: postgres:15
+    restart: always
+    container_name: postgres-sportevent
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: sportevent
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    networks:
+      - local-sportevent
+    secrets:
+      - pg_password
+
+networks:
+  local-sportevent:
+    name: local-sportevent
+    driver: bridge
+
+secrets:
+  pg_password:
+    file: ./secrets/pg_db_password.txt
