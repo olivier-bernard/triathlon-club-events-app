@@ -9,7 +9,7 @@ interface AttendeesTableClientProps {
   initialAttendeesList: string[];
 }
 
-export default function AttendeesTableClient({ eventId, initialAttendeesList }) {
+export default function AttendeesTableClient({ eventId, initialAttendeesList }: AttendeesTableClientProps) {
   const [attendeesList, setAttendeesList] = useState(initialAttendeesList);
   const [isPending, startTransition] = useTransition();
 

@@ -34,10 +34,21 @@ model Registration {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  email     String?
-  displayName String
+  id                  Int                   @id @default(autoincrement())
+  username            String                @unique
+  password            String
+  email               String?               @unique
+  displayName         String
+  createdAt           DateTime              @default(now())
+  roles               String[]              @default(["user"])
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expires   DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
   createdAt DateTime @default(now())
 }

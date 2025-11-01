@@ -6,7 +6,7 @@ interface Attendee {
 
 interface AttendeesTableProps {
   attendeesList: string[];
-  onDelete?: (attendee: Attendee) => void;
+  onDelete?: (attendee: number) => void;
 }
 
 export default function AttendeesTable({ attendeesList, onDelete }: AttendeesTableProps) {
