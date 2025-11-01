@@ -1,18 +1,28 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from "next/server";
 
-export function middleware(request) {
-  // Middleware logic can be added here for authentication, logging, etc.
-  
-  // Example: Redirect to login if user is not authenticated
-  const isAuthenticated = request.cookies.get('auth-token'); // Replace with actual authentication check
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (!isAuthenticated) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Allow access to login, register, and auth routes without authentication 
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/api/auth")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check for session token (adjust cookie name if needed)
+  const token = request.cookies.get("next-auth.session-token") || request.cookies.get("__Secure-next-auth.session-token");
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/events/:path*', '/api/:path*'], // Apply middleware to specific routes
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
