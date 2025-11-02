@@ -66,14 +66,8 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-base-100 px-4">
-            <div className="w-full max-w-md">
-                {/* Logo Placeholder */}
-                <div className="mb-8 flex justify-center">
-                    <h1 className="text-4xl font-bold text-primary">VCT Logo</h1>
-                </div>
-
-                <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 p-8 shadow-lg">
+<>
+                <div className="auth-card">
                     <h2 className="mb-6 text-center text-2xl font-bold">
                         Create your account
                     </h2>
@@ -140,7 +134,6 @@ export default function RegisterPage() {
                         Sign in
                     </Link>
                 </p>
-            </div>
-        </div>
+        </>
     );
 }

@@ -2,7 +2,18 @@ import { NextResponse } from "next/server";
 import { db } from "@/app/lib/db";
 import crypto from "crypto";
 
+const brevoApiUrl = process.env.BREVO_EMAIL_API_URL;
+const brevoApiKey = process.env.BREVO_API_KEY;
+const emailFrom = process.env.EMAIL_FROM;
+const appName = process.env.APP_NAME;
+
 export async function POST(request: Request) {
+
+  if (!brevoApiUrl || !brevoApiKey || !emailFrom) {
+    console.error("Email service is not configured. Check BREVO_EMAIL_API_URL, BREVO_API_KEY, and EMAIL_FROM in .env");
+    return NextResponse.json({ error: "Server is not configured to send emails." }, { status: 500 });
+  }
+
   try {
     const { email } = await request.json();
 
@@ -40,9 +51,9 @@ export async function POST(request: Request) {
 
     // 5. Send the email using Brevo API
     const emailPayload = {
-      sender: { email: "no-reply@yourdomain.com", name: "VCT Events" }, // Change this
+      sender: { email: emailFrom, name: appName }, // Change this
       to: [{ email: user.email! }],
-      subject: "Reset Your Password",
+      subject: `Reset Your Password for ${appName}`,
       htmlContent: `
         <h1>Password Reset Request</h1>
         <p>You are receiving this email because a password reset was requested for your account.</p>
@@ -52,10 +63,10 @@ export async function POST(request: Request) {
       `,
     };
 
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    const response = await fetch(brevoApiUrl, {
       method: "POST",
       headers: {
-        "api-key": process.env.BREVO_API_KEY!,
+        "api-key": brevoApiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(emailPayload),

@@ -27,3 +27,10 @@ body {
   background-color: hsl(var(--b2)); /* base-200 */
   color: hsl(var(--bc));            /* base-content */
 }
+
+@layer components {
+  .auth-card {
+    @apply rounded-2xl bg-blue-50/50 p-8 shadow-lg dark:bg-blue-900/20;
+  }
+}
+
