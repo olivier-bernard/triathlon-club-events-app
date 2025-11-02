@@ -14,22 +14,32 @@ export default function ForgotPasswordPage() {
     setSuccess(false);
     setLoading(true);
 
-    const form = e.currentTarget;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    try {
+      const form = e.currentTarget;
+      const email = (form.elements.namedItem("email") as HTMLInputElement).value;
 
-    const res = await fetch("/api/password/request-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+      const res = await fetch("/api/password/request-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    setLoading(false);
 
-    if (res.ok) {
-      setSuccess(true);
-    } else {
-      const data = await res.json();
-      setError(data.error || "An unexpected error occurred.");
+      setLoading(false);
+
+      if (res.ok) {
+        setSuccess(true);
+
+      } else {
+        const data = await res.json();
+        setError(data.error || "An unexpected error occurred.");
+      }
+
+    } catch (err) {
+      console.error("Submit failed:", err);
+      setError("Failed to send request. Please check your connection.");
+    } finally {
+      setLoading(false);
     }
   }
 

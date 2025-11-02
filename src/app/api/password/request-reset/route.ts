@@ -18,6 +18,7 @@ export async function POST(request: Request) {
     const { email } = await request.json();
 
     if (!email) {
+      console.log("No email provided in password reset request.");
       return NextResponse.json({ error: "Email is required." }, { status: 400 });
     }
 
@@ -78,6 +79,9 @@ export async function POST(request: Request) {
       throw new Error("Failed to send email.");
     }
 
+    // --- DEBUGGING: Log the full response from Brevo ---
+    const responseData = await response.json();
+    console.log("Brevo API Response:", JSON.stringify(responseData, null, 2));
     return NextResponse.json({ message: "If an account with that email exists, a reset link has been sent." });
 
   } catch (error) {
