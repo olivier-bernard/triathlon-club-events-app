@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import EventList from "./EventList";
 import Calendar from "react-calendar"; // If you use react-calendar
 import "@/app/calendar.css"; // Import our new custom calendar styles
 
-export default function EventViewSwitcher({ events }: { events: any[] }) {
+export default function EventViewSwitcher({ events, children, isAdmin }: { events: any[]; children: React.ReactElement; isAdmin: boolean }) {
   const [view, setView] = useState<"list" | "calendar">("list");
 
   // Helper to check if a date has an event
@@ -55,7 +54,7 @@ export default function EventViewSwitcher({ events }: { events: any[] }) {
         </button>
       </div>
       {view === "list" ? (
-        <EventList events={events} />
+        React.cloneElement(children, { isAdmin })
       ) : (
         <div className="bg-base-100 rounded-xl shadow">
           <Calendar

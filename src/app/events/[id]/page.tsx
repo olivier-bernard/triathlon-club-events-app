@@ -18,6 +18,7 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
     getEventById(inputParams.id),
     getServerSession(authOptions)
   ]);
+  const isAdmin = session?.user?.roles?.includes("admin") ?? false;
 
   if (!event) {
     return notFound();
@@ -38,10 +39,15 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
   return (
     <>
       <div className="container mx-auto p-1 md:p-8">
-        <div className="mb-2">
+        <div className="flex justify-between items-center mb-2">
           <Link href="/events" className="btn btn-primary rounded-box">
             ← Retour à la liste des événements
           </Link>
+          {isAdmin && (
+            <Link href={`/admin/events/${event.id}/edit`} className="btn btn-outline btn-primary">
+              Edit Event
+            </Link>
+          )}
         </div>
 
         {/* Event Details */}
@@ -102,7 +108,7 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
 
         {isUserRegistered ? (
           <div className="collapse collapse-arrow bg-base-200 my-6 shadow-md">
-            <input type="checkbox" /> 
+            <input type="checkbox" />
             <div className="collapse-title text-xl font-medium bg-success text-success-content">
               Vous êtes déjà inscrit ! (Cliquer pour inscrire une autre personne ?)
             </div>
