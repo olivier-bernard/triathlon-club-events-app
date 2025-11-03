@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/app/lib/db";
 import bcrypt from "bcryptjs";
 
-export async function updateProfileInfo(formData: FormData) {
+export async function updateProfileInfo(_previousState: any, formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { error: "Not authenticated" };
 
@@ -25,19 +25,28 @@ export async function updateProfileInfo(formData: FormData) {
   }
 }
 
-export async function changePassword(formData: FormData) {
+export async function changePassword(_previousState: any, formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { error: "Not authenticated" };
 
   const currentPassword = formData.get("currentPassword") as string;
   const newPassword = formData.get("newPassword") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+
+  // Server-side check to ensure passwords match
+  if (newPassword !== confirmPassword) {
+    return { error: "Passwords do not match." };
+  }
 
   try {
     const user = await db.user.findUnique({ where: { id: parseInt(session.user.id) } });
     if (!user) return { error: "User not found." };
 
+    // This is the logic that securely checks the user's current password.
     const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
-    if (!isPasswordCorrect) return { error: "Incorrect current password." };
+    if (!isPasswordCorrect) {
+      return { error: "Incorrect current password." };
+    }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     await db.user.update({
