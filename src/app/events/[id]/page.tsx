@@ -4,6 +4,8 @@ import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import Link from "next/link";
 import { EventWithRegistrations } from "@/app/lib/types"; // <-- Import the new type
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface EventDetailPageProps {
   params: { id: string };
@@ -12,11 +14,26 @@ interface EventDetailPageProps {
 
 export default async function EventDetail({ params }: EventDetailPageProps) {
   const inputParams = await params;
-  const event: EventWithRegistrations | null = await getEventById(inputParams.id);
+  const [event, session] = await Promise.all([
+    getEventById(inputParams.id),
+    getServerSession(authOptions)
+  ]);
 
   if (!event) {
     return notFound();
   }
+
+  const isUserRegistered = session?.user
+    ? event.attendeesList.some(attendeeString => {
+      try {
+        const attendee = JSON.parse(attendeeString);
+        // Compare the userId from the registration with the session user's id
+        return attendee.userId && attendee.userId === session.user.id;
+      } catch {
+        return false; // Ignore malformed JSON strings
+      }
+    })
+    : false;
 
   return (
     <>
@@ -83,13 +100,44 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
           </div >
         )}
 
-        <div className="w-4/5 md:w-3/5 mx-auto mb-6">
-          <RegistrationForm
-            eventId={event.id}
-            distanceOptions={event.distanceOptions}
-            groupLevels={event.groupLevels || ["1", "2", "3"]}
-          />
-        </div>
+        {isUserRegistered ? (
+          <div className="collapse collapse-arrow bg-base-200 my-6 shadow-md">
+            <input type="checkbox" /> 
+            <div className="collapse-title text-xl font-medium bg-success text-success-content">
+              Vous êtes déjà inscrit ! (Cliquer pour inscrire une autre personne ?)
+            </div>
+            <div className="collapse-content">
+              <div className="w-full pt-6">
+                <RegistrationForm
+                  eventId={event.id}
+                  distanceOptions={event.distanceOptions}
+                  groupLevels={event.groupLevels || undefined}
+                  user={session?.user ? {
+                    id: session.user.id,
+                    displayName: session.user.name || "",
+                    email: session.user.email || ""
+                  } : null}
+                  defaultToManual={true}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="w-4/5 md:w-3/5 mx-auto mb-6">
+            <RegistrationForm
+              eventId={event.id}
+              distanceOptions={event.distanceOptions}
+              groupLevels={event.groupLevels || undefined}
+              user={session?.user ? {
+                id: session.user.id,
+                displayName: session.user.name || "",
+                email: session.user.email || ""
+              } : null}
+            />
+          </div>
+        )}
+
+
         <AttendeesTableClient
           eventId={event.id}
           initialAttendeesList={event.attendeesList}

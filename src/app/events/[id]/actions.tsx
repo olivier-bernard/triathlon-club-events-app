@@ -1,18 +1,60 @@
 "use server";
 import { db } from "@/app/lib/db";
-import { updateEvent } from "@/app/lib/queries/events";
+import { updateEvent, getEventById } from "@/app/lib/queries/events";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { revalidatePath } from "next/cache";
 
-export async function registerForEvent(eventId: string, name: string, tour: string, groupLevel: string) {
-  if (!eventId || !name) throw new Error("Missing fields");
-  const attendeeInfo = JSON.stringify({ name, tour, groupLevel });
-  console.log("Registering", attendeeInfo, "for event", eventId);
-  await db.event.update({
-    where: { id: eventId },
-    data: {
-      attendeesList: { push: attendeeInfo },
-      attendees: { increment: 1 },
-    },
-  });
+const MANUAL_ENTRY_KEY = "manual";
+
+export async function registerForEvent(formData: FormData) {
+  const session = await getServerSession(authOptions);
+
+  const eventId = formData.get("eventId") as string;
+  const nameSelection = formData.get("nameSelection") as string;
+  const manualName = formData.get("manualName") as string;
+  const tour = formData.get("tour") as string;
+  const groupLevel = formData.get("groupLevel") as string;
+
+  if (!eventId || !tour || !groupLevel) {
+    return { error: "Missing required fields." };
+  }
+
+  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY;
+  const displayName = isManualEntry ? manualName : nameSelection;
+
+  if (!displayName) {
+    return { error: "Name is required." };
+  }
+
+  try {
+    const event = await getEventById(eventId);
+    if (!event) {
+      return { error: "Event not found." };
+    }
+
+    const newRegistrationObject = {
+      name: displayName,
+      tour: tour,
+      groupLevel: groupLevel,
+      userId: isManualEntry ? null : session?.user?.id,
+    };
+
+    const newRegistrationString = JSON.stringify(newRegistrationObject);
+
+    const updatedAttendeesList = [...event.attendeesList, newRegistrationString];
+
+    await updateEvent(eventId, {
+      attendeesList: updatedAttendeesList,
+      attendees: updatedAttendeesList.length,
+    });
+
+    revalidatePath(`/events/${eventId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Registration failed:", error);
+    return { error: "Failed to register for the event." };
+  }
 }
 
 export async function handleDelete(eventId: string, updatedAttendeesList: string[]) {

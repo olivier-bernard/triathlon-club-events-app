@@ -1,34 +1,63 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { registerForEvent } from "@/app/events/[id]/actions";
+import { useFormStatus } from "react-dom";
 
 interface RegistrationFormProps {
   eventId: string;
   distanceOptions: string[];
   groupLevels?: string[];
+  user: {
+    id: string;
+    displayName: string;
+    email: string;
+  } | null;
+  defaultToManual?: boolean; // Add this prop
 }
 
-export default function RegistrationForm({ eventId, distanceOptions, groupLevels }: RegistrationFormProps) {
+const MANUAL_ENTRY_KEY = "manual";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      className="btn btn-primary font-bold py-2 px-4 rounded-lg hover:bg-primary-focus"
+      disabled={pending}
+    >
+      {pending ? <span className="loading loading-spinner"></span> : "S'enregistrer"}
+    </button>
+  );
+}
+
+export default function RegistrationForm({ eventId, distanceOptions, groupLevels, user, defaultToManual = false }: RegistrationFormProps) {
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
   const [groupLevel, setGroupLevel] = useState(groupLevels?.[0] || "A");
+    const [nameSelection, setNameSelection] = useState(() => {
+    if (defaultToManual) {
+      return MANUAL_ENTRY_KEY;
+    }
+    return user?.displayName || MANUAL_ENTRY_KEY;
+  });
+
+  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY;
 
   async function action(formData: FormData) {
-    const name = formData.get("name") as string;
-    const tour = formData.get("tour") as string;
-    const groupLevel = formData.get("groupLevel") as string;
-    console.log("Submitting registration for", name, "to event", eventId);
+    formData.append("eventId", eventId);
+
     try {
-      await registerForEvent(eventId, name, tour, groupLevel);
-      setMessage("Registration successful!");
-      // Refresh the page to show updated attendees
-      if (typeof window !== "undefined") {
+      const result = await registerForEvent(formData);
+      if (result.error) {
+        setMessage(result.error);
+      } else {
+        setMessage("Registration successful!");
+        // A page reload is a simple way to see the updated list
         window.location.reload();
       }
-      console.log("Registration succeeded");
     } catch (err) {
-      setMessage("Registration failed.");
+      setMessage("An unexpected error occurred.");
       console.error("Registration failed", err);
     }
   }
@@ -36,42 +65,66 @@ export default function RegistrationForm({ eventId, distanceOptions, groupLevels
   return (
     <form action={action} className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">S'enregistrer à l'événement</h2>
-      {message && <p className="text-blue-500">{message}</p>}
-      <input
-        type="text"
-        name="name"
-        placeholder="Ton nom"
-        className="border p-2 rounded"
-        required
-      />
-      <select
-        name="tour"
-        value={selectedTour}
-        onChange={(e) => setSelectedTour(e.target.value)}
-        className="border p-2 rounded"
-        required
-      >
-        {distanceOptions.map((option) => (
-          <option key={option} value={option}>{option}</option>
-        ))}
-      </select>
-      <select
-        name="groupLevel"
-        value={groupLevel}
-        onChange={(e) => setGroupLevel(e.target.value)}
-        className="border p-2 rounded"
-        required
-      >
-        {(["1", "2", "3"]).map((level) => (
-          <option key={level} value={level}>{level}</option>
-        ))}
-      </select>
-      <button
-        type="submit"
-        className="btn btn-primary font-bold py-2 px-4 rounded-lg hover:bg-primary-focus"
-      >
-        S'enregistrer
-      </button>
+      {message && <p className={message.includes("successful") ? "text-success" : "text-error"}>{message}</p>}
+
+      {/* Name Input Section */}
+      <div className="form-control">
+        <label className="label"><span className="label-text">Nom</span></label>
+        {user ? (
+          <select
+            name="nameSelection"
+            className="select select-bordered"
+            value={nameSelection}
+            onChange={(e) => setNameSelection(e.target.value)}
+          >
+            <option value={user.displayName}>{user.displayName}</option>
+            <option value={MANUAL_ENTRY_KEY}>Entrer manuellement un autre aathlète</option>
+          </select>
+        ) : null}
+        {isManualEntry && (
+          <input
+            type="text"
+            name="manualName"
+            placeholder="Prénom et Nom"
+            className="input input-bordered mt-2"
+            required
+          />
+        )}
+      </div>
+
+      {/* Tour/Distance Selection */}
+      <div className="form-control">
+        <label className="label"><span className="label-text">Parcours</span></label>
+        <select
+          name="tour"
+          value={selectedTour}
+          onChange={(e) => setSelectedTour(e.target.value)}
+          className="select select-bordered"
+          required
+        >
+          {distanceOptions.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Group Level Selection */}
+      <div className="form-control">
+        <label className="label"><span className="label-text">Groupe de niveau</span></label>
+        <select
+          name="groupLevel"
+          value={groupLevel}
+          onChange={(e) => setGroupLevel(e.target.value)}
+          className="select select-bordered"
+          required
+        >
+          {(groupLevels || ["1", "2", "3"]).map((level) => (
+            <option key={level} value={level}>{level}</option>
+          ))}
+        </select>
+      </div>
+
+      <SubmitButton />
     </form>
   );
 };
