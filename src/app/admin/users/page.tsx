@@ -1,0 +1,83 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { db } from "@/app/lib/db";
+import { toggleUserActive, deleteUser } from "./actions";
+
+function ToggleActiveForm({ user }: { user: any }) {
+    return (
+        <form action={toggleUserActive}>
+            <input type="hidden" name="userId" value={user.id} />
+            <button type="submit" className="btn btn-ghost btn-xs p-0">
+                <input
+                    type="checkbox"
+                    name="active"
+                    className="toggle toggle-success"
+                    defaultChecked={user.active}
+                    style={{ pointerEvents: "none" }}
+                />
+            </button>
+        </form>
+    );
+}
+
+function DeleteUserButton({ user, currentUserId }: { user: any, currentUserId: number }) {
+    // Prevent an admin from deleting their own account
+    if (user.id === currentUserId) {
+        return null;
+    }
+
+    return (
+        <form action={deleteUser}>
+            <input type="hidden" name="userId" value={user.id} />
+            <button type="submit" className="btn btn-xs btn-error btn-ghost text-lg">✕</button>
+        </form>
+    );
+}
+
+export default async function AdminUsersPage() {
+    const session = await getServerSession(authOptions);
+
+    // Protect the route
+    if (!session?.user?.roles?.includes("admin")) {
+        redirect("/");
+    }
+
+    const users = await db.user.findMany({
+        orderBy: { username: 'asc' },
+    });
+
+    return (
+        <div className="container mx-auto p-4 md:p-8">
+            <h1 className="text-3xl font-bold mb-8">User Management</h1>
+            <div className="overflow-x-auto">
+                <table className="table w-full">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Display Name</th>
+                            <th>Email</th>
+                            <th className="text-center">Active</th>
+                            <th className="text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr key={user.id}>
+                                <td>{user.username}</td>
+                                <td>{user.displayName}</td>
+                                <td>{user.email}</td>
+                                <td className="text-center">
+                                    <ToggleActiveForm user={user} />
+                                </td>
+                                <td className="text-center">
+                                    <DeleteUserButton user={user} currentUserId={parseInt(session.user.id)} />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
