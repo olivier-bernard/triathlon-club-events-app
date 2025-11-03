@@ -8,12 +8,13 @@ import { notFound } from "next/navigation";
 const prisma = new PrismaClient();
 
 type EditEventPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-export default async function EditEventPage({ params }: EditEventPageProps) {
+export default async function EditEventPage(props: EditEventPageProps) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/");
