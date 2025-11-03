@@ -1,13 +1,18 @@
 "use client";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+    const router = useRouter();
+  const { status } = useSession();
 
+      if (status === "authenticated") {
+      router.replace("/");
+    }
 
   return (
     <>

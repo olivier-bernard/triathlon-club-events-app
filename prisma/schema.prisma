@@ -11,7 +11,7 @@ model Event {
   id              String   @id @default(uuid())
   activity        String
   date            DateTime
-  time            DateTime
+  time            DateTime?
   type            String
   distanceOptions String[]
   eventLinks      String[]
@@ -20,7 +20,7 @@ model Event {
   attendeesList   String[]
   attendeesLimit  Int
   attendees       Int
-  seance          String
+  seance          String?
   registrations   Registration[]
 }
 

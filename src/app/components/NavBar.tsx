@@ -18,7 +18,30 @@ export default async function NavBar() {
           VCT Events
         </Link>
       </div>
+
       <div className="flex-none gap-2">
+
+        {/* Admin Menu Dropdown */}
+        {session.user?.roles?.includes('admin') && (
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost text-xl">
+              Admin
+            </label>
+            <ul
+              tabIndex={0}
+              className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <Link href="/admin/events/new" className="text-base">Add Event</Link>
+              </li>
+              <li>
+                <Link href="/admin/users" className="text-base">Manage Users</Link>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* User Profile Dropdown */}
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
@@ -38,11 +61,7 @@ export default async function NavBar() {
             <li>
               <Link href="/profile" className="text-base">Profile</Link>
             </li>
-            {session.user?.roles?.includes('admin') && (
-              <li>
-                <Link href="/admin/users" className="text-base">Manage Users</Link>
-              </li>
-            )}
+    
             <LogoutButton />
           </ul>
         </div>

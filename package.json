@@ -16,7 +16,8 @@
     "next-auth": "^4.24.13",
     "react": "latest",
     "react-calendar": "^6.0.0",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^14.0.0",
