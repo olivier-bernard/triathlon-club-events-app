@@ -36,7 +36,7 @@ export default async function NavBar() {
               <span>Signed in as {session.user?.name}</span>
             </li>
             <li>
-              <a href="text-base">Profile</a>
+              <Link href="/profile" className="text-base">Profile</Link>
             </li>
             <LogoutButton />
           </ul>
