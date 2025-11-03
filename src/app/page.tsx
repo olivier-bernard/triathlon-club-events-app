@@ -13,21 +13,31 @@
 // limitations under the License.
 // 
 
-import EventViewSwitcher from "./components/EventViewSwitcher";
 import { getEvents } from "./lib/queries/events";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+import EventsContainer from "./components/EventsContainer";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
+// This is a clean Server Component again.
+export default async function EventsPage() {
+  const [events, session] = await Promise.all([
+    getEvents(),
+    getServerSession(authOptions),
+  ]);
 
-  const events = await getEvents();
+  const isAdmin = session?.user?.roles?.includes("admin") ?? false;
+
+  const safeEvents = events.map((event) => ({
+    ...event,
+    date: event.date.toISOString(),
+    time: event.time ? event.time.toISOString() : null,
+  }));
 
   return (
-    <div className="container mx-auto px-2 py-4 md:px-4">
-      <h1 className="text-2xl font-bold mb-4">Triathlon & Training Events</h1>
-      <EventViewSwitcher events={events} />
+    <div className="container mx-auto px-2 py-4">
+      <h1 className="text-2xl font-bold mb-4">Evenements VCT</h1>
+
+      <EventsContainer initialEvents={safeEvents} isAdmin={isAdmin} />
     </div>
   );
 }
