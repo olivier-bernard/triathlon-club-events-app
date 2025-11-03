@@ -22,6 +22,9 @@ export function ProfileInfoForm({ user }: { user: User }) {
       <div className="card-body">
         <h2 className="card-title">Profile Information for {user.username}</h2>
         <form action={formAction} className="space-y-4">
+          {user.roles?.includes("admin") && (
+            <div className="badge badge-info badge-outline">Admin User</div>
+          )}
           <div>
             <label className="label"><span className="label-text">Display Name</span></label>
             <input name="displayName" type="text" defaultValue={user.displayName} className="input input-bordered w-full" />

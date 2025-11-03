@@ -23,7 +23,7 @@ export default async function NavBar() {
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
               {/* Display user initials */}
-              <span className="text-xl font-bold">
+              <span className="text-xl font-bold flex items-center justify-center h-full">
                 {session.user?.name?.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -38,6 +38,11 @@ export default async function NavBar() {
             <li>
               <Link href="/profile" className="text-base">Profile</Link>
             </li>
+            {session.user?.roles?.includes('admin') && (
+              <li>
+                <Link href="/admin/users" className="text-base">Manage Users</Link>
+              </li>
+            )}
             <LogoutButton />
           </ul>
         </div>

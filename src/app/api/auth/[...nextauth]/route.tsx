@@ -38,20 +38,18 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Compare password
-          const isValid = await bcrypt.compare(credentials.password, user.password);
-          if (!isValid) {
+          const passwordMatch = await bcrypt.compare(credentials.password, user.password);
+          if (!passwordMatch) {
             console.log("Invalid password for user:", credentials.username);
             return null;
           }
 
-          console.log("User authenticated:", user.username);
-
+          if (!user.active) {
+            console.log("User inactive:", credentials.username);
+            return null;
+          }
           // Return user object (id, name, email)
-          return {
-            id: user.id.toString(),
-            name: user.displayName || user.username,
-            email: user.email,
-          };
+          return user;
         } catch (error) {
           console.error("Error during authorization:", error);
           return null;
@@ -65,6 +63,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.roles = user.roles;
+        token.name = user.displayName || user.username ;
       }
       return token;
     },
@@ -72,6 +72,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.roles = token.roles as string[];
+        session.user.name = token.name;
       }
       return session;
     },
