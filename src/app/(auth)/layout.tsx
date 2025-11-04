@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AuthLayout({
   children,
 }: {
@@ -8,10 +10,22 @@ export default function AuthLayout({
       <div className="w-full max-w-md">
         {/* Logo Placeholder */}
         <div className="mb-8 flex justify-center">
-          <h1 className="text-4xl font-bold text-primary">VCT Logo</h1>
+          {process.env.CLUB_LOGO_URL ? (
+            <Image
+              src={process.env.CLUB_LOGO_URL}
+              alt="Club Logo"
+              width={150}
+              height={150}
+              className="h-auto w-auto object-contain"
+              priority
+            />
+          ) : process.env.APP_NAME ? (
+            <h1 className="text-4xl font-bold text-primary">{process.env.APP_NAME}</h1>
+          ) : (
+            <h1 className="text-4xl font-bold text-primary">Add your Name or Logo in .env file</h1>
+          )}
         </div>
 
-        {/* The content from login, register, etc., will be rendered here */}
         {children}
       </div>
     </div>
