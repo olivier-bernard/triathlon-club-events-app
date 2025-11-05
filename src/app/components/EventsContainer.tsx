@@ -20,16 +20,20 @@ export default function EventsContainer({ initialEvents, isAdmin }: EventsContai
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setView("list")}
-          className={`btn btn-sm mr-2 ${
-            currentView === "list" ? "btn-primary font-bold" : "btn-outline"
+          className={`btn btn-sm mr-2 transition-colors duration-200 ${
+            currentView === "list" 
+              ? "btn-primary font-bold" 
+              : "btn-outline hover:bg-primary hover:text-primary-content hover:border-primary"
           }`}
         >
           List View
         </button>
         <button
           onClick={() => setView("calendar")}
-          className={`btn btn-sm ${
-            currentView === "calendar" ? "btn-primary" : "btn-outline"
+          className={`btn btn-sm transition-colors duration-200 ${
+            currentView === "calendar" 
+              ? "btn-primary font-bold" 
+              : "btn-outline hover:bg-primary hover:text-primary-content hover:border-primary"
           }`}
         >
           Calendar View

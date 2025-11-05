@@ -1,5 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import type { Event } from "@/app/lib/types";
+
+// --- ICONS ---
+const CalendarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+);
+const LocationIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+);
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197" /></svg>
+);
+const RoadIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+);
 
 type EventCardProps = {
   event: Event;
@@ -14,55 +30,73 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin }) => {
     timeZone: "UTC", 
   });
 
-  // Format the time for display using the French locale AND UTC timezone
-    const timeStr = event.time ? new Date(event.time).toLocaleTimeString("fr-FR", {
+  const timeStr = event.time ? new Date(event.time).toLocaleTimeString("fr-FR", {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false, // Ensures 24-hour format
+    hour12: false,
     timeZone: "UTC", 
   }) : '';
 
+  const getBorderColor = () => {
+    if (event.type === 'Competition') return 'border-red-500';
+    if (event.activity === 'Natation') return 'border-blue-500';
+    if (event.type === 'Entrainement') return 'border-green-500';
+    return 'border-transparent';
+  };
+
   return (
-    <div className="relative bg-base-100 rounded-2xl shadow-xl p-2 md:p-5 transition-transform hover:scale-105 hover:shadow-2xl border-base-200">
+    <div className={`relative flex bg-base-100 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 ${getBorderColor()}`}>
+      
       {isAdmin && (
         <Link
           href={`/admin/events/${event.id}/edit`}
-          className="absolute top-2 left-1/2 -translate-x-1/2 btn btn-xs btn-outline btn-primary z-10"
+          className="absolute top-2 right-2 btn btn-xs btn-ghost btn-circle z-10"
+          aria-label="Edit Event"
         >
-          Edit
+          ✏️
         </Link>
       )}
+
       <Link
         href={`/events/${event.id}`}
-        className="block cursor-pointer"
+        className="block w-full p-4"
       >
-        {/* First row: date, time, activity */}
-        <div className="flex flex-wrap items-center justify-between text-base-content text-sm mb-2">
-          <div className="flex items-center gap-1">
-            <span className="font-semibold">{dateStr}</span>
-            {timeStr && <span>-</span>}
-            <span>{timeStr}</span>
+        <div className="flex flex-col gap-1.5">
+          
+          <h3 className="text-lg font-bold text-primary truncate pr-8">{event.description}</h3>
+
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex items-center gap-1 text-sm text-base-content/70 flex-shrink-0">
+              <CalendarIcon />
+              <span className="font-bold">{dateStr}</span>
+              {timeStr && <span>- {timeStr}</span>}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+                {event.type}
+              </span>
+              <span className="badge badge-secondary">{event.activity}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
-              {event.type}
-            </span>
-            <span>-</span>
-            <span className="badge badge-primary">{event.activity}</span>
+
+          <div className="flex justify-between items-center text-sm mt-1">
+            <div className="flex items-center gap-1.5">
+              <UsersIcon />
+              <span>
+                {event.attendees}
+                {event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <LocationIcon />
+              <span>{event.location}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <RoadIcon />
+              <span>{event.distanceOptions.join(" / ")}</span>
+            </div>
           </div>
-        </div>
-        {/* Second row: attendees, location, distances */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-sm text-base-content">
-            👥 {event.attendees}
-            {event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}
-          </span>
-          <span className="text-sm text-base-content truncate">
-            📍 {event.location}
-          </span>
-          <span className="text-sm text-base-content">
-            {event.distanceOptions.join("/")}
-          </span>
+
         </div>
       </Link>
     </div>

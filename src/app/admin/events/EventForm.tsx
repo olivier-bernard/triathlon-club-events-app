@@ -1,9 +1,8 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { type Event } from "@prisma/client";
 import { createEvent, updateEvent } from "./actions";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 
 type EventFormProps = {
     event?: Event | null;
@@ -12,7 +11,7 @@ type EventFormProps = {
 export default function EventForm({ event }: EventFormProps) {
     const isEditing = !!event;
     const action = isEditing ? updateEvent : createEvent;
-    const [state, formAction] = useFormState(action, { message: "" });
+    const [state, formAction] = useActionState(action, { message: "" });
     const [eventType, setEventType] = useState(event?.type || "Entrainement");
 
     // For editing, format date and time for input fields
