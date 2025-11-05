@@ -47,7 +47,8 @@ model Account {
   id_token           String?  @db.Text
   session_state      String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calendarView       Boolean  @default(false) // false = list view, true = calendar view
 
   @@unique([provider, providerAccountId])
 }

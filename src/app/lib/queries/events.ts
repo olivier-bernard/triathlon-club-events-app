@@ -7,14 +7,6 @@ export async function getEvents() {
   });
 }
 
-/*
-export async function getEventById(id: string) {
-  return prisma.event.findUnique({
-    where: { id },
-    include: { registrations: true },
-  });
-} */
-
 export async function getEventById(id: string) {
 
   return db.event.findUnique({
@@ -130,3 +122,24 @@ export async function updateEvent(eventId: string, data: Partial<{
   });
 }
 
+export async function getUpcomingEvents() {
+  try {
+    const events = await db.event.findMany({
+      where: {
+        // Find events where the date is greater than or equal to today
+        date: {
+          gte: new Date(),
+        },
+      },
+      orderBy: {
+        // Order them from soonest to latest
+        date: 'asc',
+      },
+    });
+    return events;
+  } catch (error) {
+    console.error("Database Error: Failed to fetch upcoming events.", error);
+    // In case of an error, return an empty array to prevent the page from crashing.
+    return [];
+  }
+}

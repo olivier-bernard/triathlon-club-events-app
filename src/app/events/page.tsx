@@ -1,28 +1,31 @@
-import { getEvents } from "../lib/queries/events";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { getUpcomingEvents } from "../lib/queries/events";
 import EventsContainer from "../components/EventsContainer";
 
-// This is a clean Server Component again.
-export default async function EventsPage() {
-  const [events, session] = await Promise.all([
-    getEvents(),
-    getServerSession(authOptions),
-  ]);
+export const dynamic = 'force-dynamic';
 
+export default async function EventsPage() {
+  const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
+  const events = await getUpcomingEvents();
+
+  const userPrefersCalendar = session?.user?.calendarView ?? false;
 
   const safeEvents = events.map((event) => ({
     ...event,
     date: event.date.toISOString(),
-    time: event.time ? event.time.toISOString() : null,
+    time: event.time?.toISOString() ?? null,
   }));
 
   return (
     <div className="container mx-auto px-2 py-4">
-      <h1 className="text-2xl font-bold mb-4">Evenements VCT</h1>
-
-      <EventsContainer initialEvents={safeEvents} isAdmin={isAdmin} />
+      <h1 className="text-2xl font-bold mb-4">Événements à venir</h1>
+      <EventsContainer
+        initialEvents={safeEvents}
+        isAdmin={isAdmin}
+        initialView={userPrefersCalendar ? 'calendar' : 'list'}
+      />
     </div>
   );
 }

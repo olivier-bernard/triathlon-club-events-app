@@ -1,25 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import type { Event } from "@/app/lib/types";
 import EventList from "./EventList";
 import EventCalendar from "./EventCalendar";
-import type { Event } from "@/app/lib/types";
+import { updateDisplayPreference } from "../profile/actions";
 
 type EventsContainerProps = {
   initialEvents: Event[];
   isAdmin: boolean;
+  initialView: 'list' | 'calendar';
 };
 
-export default function EventsContainer({ initialEvents, isAdmin }: EventsContainerProps) {
-  // The currentView state is now managed here, on the client.
-  const [currentView, setView] = useState("list");
+export default function EventsContainer({ initialEvents, isAdmin, initialView }: EventsContainerProps) {
+  const [currentView, setView] = useState(initialView);
+
+  const handleSetView = (view: 'list' | 'calendar') => {
+    setView(view);
+    // Save the preference to the database (fire-and-forget)
+    updateDisplayPreference(view === 'calendar');
+  };
 
   return (
     <div>
-      {/* These buttons now just change the client-side state. */}
       <div className="flex justify-end mb-4">
         <button
-          onClick={() => setView("list")}
+          onClick={() => handleSetView("list")}
           className={`btn btn-sm mr-2 transition-colors duration-200 ${
             currentView === "list" 
               ? "btn-primary font-bold" 
@@ -29,7 +35,7 @@ export default function EventsContainer({ initialEvents, isAdmin }: EventsContai
           List View
         </button>
         <button
-          onClick={() => setView("calendar")}
+          onClick={() => handleSetView("calendar")}
           className={`btn btn-sm transition-colors duration-200 ${
             currentView === "calendar" 
               ? "btn-primary font-bold" 
@@ -40,11 +46,10 @@ export default function EventsContainer({ initialEvents, isAdmin }: EventsContai
         </button>
       </div>
 
-      {/* Conditionally render the correct component based on the state */}
       {currentView === "list" ? (
         <EventList events={initialEvents} isAdmin={isAdmin} />
       ) : (
-        <EventCalendar events={initialEvents} />
+        <EventCalendar events={initialEvents} isAdmin={isAdmin} />
       )}
     </div>
   );

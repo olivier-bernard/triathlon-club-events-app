@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/app/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import bcrypt from "bcryptjs";
 
 export async function updateProfileInfo(_previousState: any, formData: FormData) {
@@ -57,5 +57,23 @@ export async function changePassword(_previousState: any, formData: FormData) {
     return { success: "Password updated successfully." };
   } catch (error) {
     return { error: "Failed to update password." };
+  }
+}
+
+export async function updateDisplayPreference(calendarView: boolean) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { calendarView },
+    });
+    revalidatePath("/events");
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to update preference." };
   }
 }
