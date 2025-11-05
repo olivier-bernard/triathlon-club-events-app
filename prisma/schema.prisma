@@ -33,16 +33,49 @@ model Registration {
   createdAt DateTime @default(now())
 }
 
+model Account {
+  id                 String  @id @default(cuid())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
   id                  Int                   @id @default(autoincrement())
   username            String                @unique
   password            String
-  email               String? 
+  email               String?
+  emailVerified       DateTime?
+  image               String?
   displayName         String
   createdAt           DateTime              @default(now())
   roles               String[]              @default(["user"])
   active              Boolean               @default(true)
+  calendarView        Boolean   @default(false) // false = list view, true = calendar view
+  language            String    @default("fr")
   passwordResetTokens PasswordResetToken[]
+  accounts            Account[]
+  sessions            Session[]
 }
 
 model PasswordResetToken {
