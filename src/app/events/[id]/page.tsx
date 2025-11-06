@@ -67,101 +67,112 @@ export default async function EventDetail(props: EventDetailPageProps) {
       </div>
 
       {/* --- Main Content Container --- 
-          On mobile: A flex column, allowing reordering.
-          On desktop: A 3-column grid.
+          On mobile: A grid where the column wrappers are ignored (`display: contents`), allowing free reordering of cards.
+          On desktop: A flex container creating two independent columns.
       --- */}
-      <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8">
+      <div className="grid lg:flex lg:gap-8">
         
-        {/* Mobile Order: 1 / Desktop: Left Column */}
-        <div className={`card bg-base-200 shadow-xl border-l-4 ${getBorderColor()} order-1 lg:col-span-2`}>
-          <div className="card-body">
-            <div className="flex justify-between items-start mb-2">
-              <h1 className="card-title text-3xl md:text-4xl font-bold">{event.description}</h1>
-              <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
-                <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
-                  {event.type}
-                </span>
-                <span className="badge badge-secondary">{event.activity}</span>
-              </div>
-            </div>
-            
-            <div className="space-y-3 text-base md:text-lg mt-4">
-              <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString("fr-FR", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
-              <p className="flex items-center"><MapPinIcon className="h-6 w-6 mr-3 text-primary" /> {event.location}</p>
-              <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> Distances: {event.distanceOptions.join(" / ")}</p>
-              <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> Participants: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Order: 2 / Desktop: Left Column */}
-        {event.eventLinks && event.eventLinks.length > 0 && (
-          <div className="card bg-base-200 shadow-xl order-2 lg:col-span-2">
+        {/* --- Left Column --- 
+            On mobile, `contents` makes this div disappear, and its children become direct grid items.
+            On desktop, it becomes a flex column taking up 2/3 of the width.
+        --- */}
+        <div className="contents lg:w-2/3 lg:flex lg:flex-col lg:gap-6">
+          {/* Mobile Order: 1 */}
+          <div className={`card bg-base-200 shadow-xl border-l-4 ${getBorderColor()} order-1`}>
             <div className="card-body">
-              <h2 className="card-title"><ArrowRightCircleIcon className="h-6 w-6 mr-2 text-primary" />Circuits<span className="text-sm font-normal italic ml-2">- Cliquer pour accéder au parcours ou description</span></h2>
-              <div className="flex flex-wrap gap-3 mt-2">
-                {event.eventLinks.map((link: any, index: number) => (
-                  <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-secondary">
-                    {event.distanceOptions[index] || `Parcours ${index + 1}`}
-                  </a>
-                ))}
+              <div className="flex justify-between items-start mb-2">
+                <h1 className="card-title text-3xl md:text-4xl font-bold">{event.description}</h1>
+                <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
+                  <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+                    {event.type}
+                  </span>
+                  <span className="badge badge-secondary">{event.activity}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3 text-base md:text-lg mt-4">
+                <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString("fr-FR", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
+                <p className="flex items-center"><MapPinIcon className="h-6 w-6 mr-3 text-primary" /> {event.location}</p>
+                <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> Distances: {event.distanceOptions.join(" / ")}</p>
+                <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> Participants: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Mobile Order: 3 / Desktop: Right Column (Top) */}
-        {event.seance && (
-          <div className="card bg-base-200 shadow-xl order-3 lg:col-start-3 lg:row-start-1">
-            <div className="card-body">
-              <h2 className="card-title"><ClipboardDocumentListIcon className="h-6 w-6 mr-2 text-primary" />Séance du jour</h2>
-              <p className="whitespace-pre-line p-2 rounded-box mt-2">{event.seance}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Order: 4 / Desktop: Right Column (Bottom) */}
-        <div className="order-4 lg:col-start-3 lg:row-start-2">
-          {isUserRegistered ? (
-            <div className="collapse collapse-arrow bg-base-200 shadow-xl">
-              <input type="checkbox" />
-              <div className="collapse-title text-xl font-medium bg-success text-success-content">
-                Vous êtes déjà inscrit !
-              </div>
-              <div className="collapse-content">
-                <p className="pt-4">Vous pouvez inscrire une autre personne ci-dessous.</p>
-                 <RegistrationForm
-                    eventId={event.id}
-                    distanceOptions={event.distanceOptions}
-                    groupLevels={event.groupLevels || undefined}
-                    user={null} // Forcing registration for another person
-                  />
-              </div>
-            </div>
-          ) : (
-            <div className="card bg-base-200 shadow-xl">
+          {/* Mobile Order: 2 */}
+          {event.eventLinks && event.eventLinks.length > 0 && (
+            <div className="card bg-base-200 shadow-xl order-2">
               <div className="card-body">
-                <h2 className="card-title">S'inscrire à l'événement</h2>
-                <RegistrationForm
-                  eventId={event.id}
-                  distanceOptions={event.distanceOptions}
-                  groupLevels={event.groupLevels || undefined}
-                  user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
-                />
+                <h2 className="card-title"><ArrowRightCircleIcon className="h-6 w-6 mr-2 text-primary" />Circuits<span className="text-sm font-normal italic ml-2">- Cliquer pour accéder au parcours ou description</span></h2>
+                <div className="flex flex-wrap gap-3 mt-2">
+                  {event.eventLinks.map((link: any, index: number) => (
+                    <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-secondary">
+                      {event.distanceOptions[index] || `Parcours ${index + 1}`}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           )}
+
+          {/* Mobile Order: 5 */}
+          <div className="card bg-base-200 shadow-xl order-5">
+            <div className="card-body">
+              <h2 className="card-title">Participants</h2>
+              <AttendeesTableClient
+                eventId={event.id}
+                initialAttendeesList={event.attendeesList}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Mobile Order: 5 / Desktop: Left Column */}
-        <div className="card bg-base-200 shadow-xl order-5 lg:col-span-2">
-          <div className="card-body">
-            <h2 className="card-title">Participants</h2>
-            <AttendeesTableClient
-              eventId={event.id}
-              initialAttendeesList={event.attendeesList}
-            />
+        {/* --- Right Column ---
+            Behaves the same as the left column: `contents` on mobile, a flex column on desktop.
+        --- */}
+        <div className="contents lg:w-1/3 lg:flex lg:flex-col lg:gap-6">
+          {/* Mobile Order: 3 */}
+          {event.seance && (
+            <div className="card bg-base-200 shadow-xl order-3">
+              <div className="card-body">
+                <h2 className="card-title"><ClipboardDocumentListIcon className="h-6 w-6 mr-2 text-primary" />Séance du jour</h2>
+                <p className="whitespace-pre-line p-2 rounded-box mt-2">{event.seance}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Order: 4 */}
+          <div className="order-4">
+            {isUserRegistered ? (
+              <div className="collapse collapse-arrow bg-base-200 shadow-xl">
+                <input type="checkbox" />
+                <div className="collapse-title text-xl font-medium bg-success text-success-content">
+                  Vous êtes déjà inscrit !
+                </div>
+                <div className="collapse-content">
+                  <p className="pt-4">Vous pouvez inscrire une autre personne ci-dessous.</p>
+                   <RegistrationForm
+                      eventId={event.id}
+                      distanceOptions={event.distanceOptions}
+                      groupLevels={event.groupLevels || undefined}
+                      user={null} // Forcing registration for another person
+                    />
+                </div>
+              </div>
+            ) : (
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <h2 className="card-title">S'inscrire à l'événement</h2>
+                  <RegistrationForm
+                    eventId={event.id}
+                    distanceOptions={event.distanceOptions}
+                    groupLevels={event.groupLevels || undefined}
+                    user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
