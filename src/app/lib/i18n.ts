@@ -20,6 +20,10 @@ type Translations = {
     cycling: string;
     competitions: string;
   };
+  calendar: {
+    weekOf: string;
+    noEventsThisWeek: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -53,6 +57,10 @@ export const translations: Record<string, Translations> = {
       allEvents: "All Events",
       cycling: "Cycling",
       competitions: "Competitions",
+    },
+    calendar: {
+      weekOf: "Week of",
+      noEventsThisWeek: "No events for this week.",
     }
   },
   fr: {
@@ -85,6 +93,10 @@ export const translations: Record<string, Translations> = {
       allEvents: "Tous les événements",
       cycling: "Cyclisme",
       competitions: "Compétitions",
+    },
+    calendar: {
+      weekOf: "Semaine du",
+      noEventsThisWeek: "Aucun événement pour cette semaine.",
     }
   },
 };
