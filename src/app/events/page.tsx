@@ -15,18 +15,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
+  
+  // Read the preference directly from the session user object
+  const userPrefersCalendar = (session?.user as any)?.calendarView ?? false;
 
-  // Parse search params for filtering
   const filters = {
     showPast: searchParams.showPast === 'true',
-    activity: searchParams.activity as Activity | undefined,
-    type: searchParams.type as EventType | undefined,
-    fromDate: searchParams.fromDate as string | undefined,
-    toDate: searchParams.toDate as string | undefined,
+    activity: searchParams['activity'] as Activity | undefined,
+    type: searchParams['type'] as EventType | undefined,
+    fromDate: searchParams['fromDate'] as string | undefined,
+    toDate: searchParams['toDate'] as string | undefined,
   };
 
   const events = await getEvents(filters);
-  const userPrefersCalendar = session?.user?.calendarView ?? false;
 
   const safeEvents = events.map((event) => ({
     ...event,

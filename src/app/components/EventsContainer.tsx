@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Import useEffect
 import { useSession } from "next-auth/react";
 import { type Event } from "@prisma/client";
 import EventList from "./EventList";
@@ -19,8 +19,14 @@ type EventsContainerProps = {
 export default function EventsContainer({ initialEvents, isAdmin, initialView, lang }: EventsContainerProps) {
   const [currentView, setView] = useState(initialView);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [events, setEvents] = useState(initialEvents); // Add state for events
   const { update } = useSession();
   const { filterLabels } = getTranslations(lang);
+
+  // This effect hook makes the filtering work by updating the displayed events
+  useEffect(() => {
+    setEvents(initialEvents);
+  }, [initialEvents]);
 
   const handleSetView = async (view: 'list' | 'calendar') => {
     setView(view);
@@ -57,9 +63,9 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
 
       <div className={isFilterOpen ? "mt-4" : ""}>
         {currentView === 'list' ? (
-          <EventList events={initialEvents} isAdmin={isAdmin} />
+          <EventList events={events} isAdmin={isAdmin} />
         ) : (
-          <EventCalendar events={initialEvents} />
+          <EventCalendar events={events} />
         )}
       </div>
     </div>

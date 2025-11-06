@@ -78,7 +78,16 @@ export const authOptions: NextAuthOptions = {
 
       // When the session is updated (e.g., by calling `useSession().update()`),
       // fetch the latest user data from the DB and update the token.
-      if (trigger === "update") {
+      if (trigger === "update" && session) {
+        // **This is the new part**: Check if calendarView is being updated and save it to the DB.
+        if (typeof session.calendarView === 'boolean') {
+          await db.user.update({
+            where: { id: token.id as string },
+            data: { calendarView: session.calendarView },
+          });
+        }
+
+        // This is your existing logic to keep the token fresh. It now runs after the potential update.
         const dbUser = await db.user.findUnique({
           where: { id: token.id as string },
         });
