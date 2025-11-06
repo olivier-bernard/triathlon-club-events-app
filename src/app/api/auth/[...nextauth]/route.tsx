@@ -1,11 +1,18 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { db } from "@/app/lib/db";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 8 * 24 * 60 * 60, // 8 days
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
 
   providers: [
     GoogleProvider({
@@ -57,32 +64,42 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  session: { strategy: "jwt" },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // On initial sign-in, populate the token with user data
       if (user) {
         token.id = user.id;
+        token.name = user.displayName; // Use displayName from your DB model
+        token.email = user.email;
         token.roles = user.roles;
-        token.name = user.displayName || user.username ;
+        token.calendarView = user.calendarView;
       }
+
+      // When the session is updated (e.g., by calling `useSession().update()`),
+      // fetch the latest user data from the DB and update the token.
+      if (trigger === "update") {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.id as string },
+        });
+        if (dbUser) {
+          token.name = dbUser.displayName; // Use displayName from your DB model
+          token.email = dbUser.email;
+          token.calendarView = dbUser.calendarView;
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
-        session.user.roles = token.roles;
-        session.user.calendarView = token.calendarView;
+        session.user.id = token.id as string;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.roles = token.roles as string[];
+        session.user.calendarView = token.calendarView as boolean;
       }
       return session;
-    },
-    jwt: async ({ token, user }) => {
-      if (user) {
-        token.id = user.id;
-        token.roles = user.roles;
-        token.calendarView = user.calendarView;
-      }
-      return token;
     },
   },
 

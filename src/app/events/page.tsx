@@ -11,6 +11,7 @@ export default async function EventsPage() {
   const events = await getUpcomingEvents();
 
   const userPrefersCalendar = session?.user?.calendarView ?? false;
+  console.log("Users preference for calendar view:", userPrefersCalendar);
 
   const safeEvents = events.map((event) => ({
     ...event,

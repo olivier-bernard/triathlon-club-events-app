@@ -15,10 +15,11 @@ export async function updateProfileInfo(_previousState: any, formData: FormData)
 
   try {
     await db.user.update({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       data: { displayName, email },
     });
     revalidatePath("/profile"); // Refresh the data on the profile page
+    revalidatePath("/", "layout"); // Revalidate the root layout to update NavBar
     return { success: "Profile updated successfully." };
   } catch (error) {
     return { error: "Failed to update profile." };
@@ -67,10 +68,11 @@ export async function updateDisplayPreference(calendarView: boolean) {
   }
 
   try {
-    await prisma.user.update({
+    await db.user.update({
       where: { id: session.user.id },
       data: { calendarView },
     });
+    revalidatePath("/");
     revalidatePath("/events");
     return { success: true };
   } catch (error) {

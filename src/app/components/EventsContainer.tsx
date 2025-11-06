@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import type { Event } from "@/app/lib/types";
 import EventList from "./EventList";
 import EventCalendar from "./EventCalendar";
@@ -14,11 +15,14 @@ type EventsContainerProps = {
 
 export default function EventsContainer({ initialEvents, isAdmin, initialView }: EventsContainerProps) {
   const [currentView, setView] = useState(initialView);
+  const { update } = useSession();
 
-  const handleSetView = (view: 'list' | 'calendar') => {
+  const handleSetView = async (view: 'list' | 'calendar') => {
     setView(view);
-    // Save the preference to the database (fire-and-forget)
-    updateDisplayPreference(view === 'calendar');
+    // Save the preference to the database
+    await updateDisplayPreference(view === 'calendar');
+    // Trigger a session update to refresh the JWT with the new preference
+    await update();
   };
 
   return (

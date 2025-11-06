@@ -3,7 +3,4 @@ module.exports = {
     tailwindcss: {},
     autoprefixer: {},
   },
-  daisyui: {
-    themes: ["light", "dark", "cupcake"],
-  },
 };
