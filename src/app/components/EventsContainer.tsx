@@ -26,7 +26,6 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
 
   return (
     <div>
-      {/* This single container now handles all layout states */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-y-4">
         <EventFilters 
           lang={lang} 
@@ -34,19 +33,22 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
           setIsOpen={setIsFilterOpen}
         />
 
-        <div className="join">
-          <button
-            className={`join-item btn btn-sm ${currentView === 'list' ? 'btn-primary' : ''}`}
-            onClick={() => handleSetView('list')}
-          >
-            List View
-          </button>
-          <button
-            className={`join-item btn btn-sm ${currentView === 'calendar' ? 'btn-primary' : ''}`}
-            onClick={() => handleSetView('calendar')}
-          >
-            Calendar View
-          </button>
+        {/* The 'w-full' and 'justify-end' on the wrapper div are new */}
+        <div className="w-full md:w-auto flex justify-end">
+            <div className="join">
+            <button
+                className={`join-item btn btn-sm ${currentView === 'list' ? 'btn-primary' : ''}`}
+                onClick={() => handleSetView('list')}
+            >
+                List View
+            </button>
+            <button
+                className={`join-item btn btn-sm ${currentView === 'calendar' ? 'btn-primary' : ''}`}
+                onClick={() => handleSetView('calendar')}
+            >
+                Calendar View
+            </button>
+            </div>
         </div>
       </div>
 
