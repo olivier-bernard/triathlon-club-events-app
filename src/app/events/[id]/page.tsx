@@ -15,6 +15,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getEventById } from "@/app/lib/queries/events";
 import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";
+import { getTranslations } from "@/app/lib/i18n";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
@@ -28,6 +29,8 @@ export default async function EventDetail(props: EventDetailPageProps) {
   const session = await getServerSession(authOptions);
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
+  const lang = session?.user?.language || 'fr';
+  const { eventDetail, eventTypeTranslations, activityTranslations } = getTranslations(lang);
 
   if (!event) {
     return notFound();
@@ -44,11 +47,11 @@ export default async function EventDetail(props: EventDetailPageProps) {
       })
     : false;
 
-  // Helper function for border color, same as in EventCard
+  // Helper function for border color, updated to use enum keys
   const getBorderColor = () => {
-    if (event.type === 'Competition') return 'border-red-500';
-    if (event.activity === 'Natation') return 'border-blue-500';
-    if (event.type === 'Entrainement') return 'border-green-500';
+    if (event.type === 'COMPETITION') return 'border-red-500';
+    if (event.activity === 'SWIMMING') return 'border-blue-500';
+    if (event.type === 'TRAINING') return 'border-green-500';
     return 'border-transparent';
   };
 
@@ -56,26 +59,20 @@ export default async function EventDetail(props: EventDetailPageProps) {
     <div className="container mx-auto p-4 md:p-8">
       {/* --- Header --- */}
       <div className="flex justify-between items-center mb-6">
-        <Link href="/" className="btn btn-outline btn-primary rounded-box">
-          ← Retour
+        <Link href="/events" className="btn btn-outline btn-primary rounded-box">
+          ← {eventDetail.back}
         </Link>
         {isAdmin && (
           <Link href={`/admin/events/${event.id}/edit`} className="btn btn-primary">
-            Modifier l'événement
+            {eventDetail.editEvent}
           </Link>
         )}
       </div>
 
-      {/* --- Main Content Container --- 
-          On mobile: A grid where the column wrappers are ignored (`display: contents`), allowing free reordering of cards.
-          On desktop: A flex container creating two independent columns.
-      --- */}
+      {/* --- Main Content Container --- */}
       <div className="grid lg:flex lg:gap-8">
         
-        {/* --- Left Column --- 
-            On mobile, `contents` makes this div disappear, and its children become direct grid items.
-            On desktop, it becomes a flex column taking up 2/3 of the width.
-        --- */}
+        {/* --- Left Column --- */}
         <div className="contents lg:w-2/3 lg:flex lg:flex-col lg:gap-6">
           {/* Mobile Order: 1 */}
           <div className={`card bg-base-200 shadow-xl border-l-4 ${getBorderColor()} order-1`}>
@@ -83,19 +80,19 @@ export default async function EventDetail(props: EventDetailPageProps) {
               <div className="flex justify-between items-start mb-2">
                 <h1 className="card-title text-3xl md:text-4xl font-bold">{event.description}</h1>
                 <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
-                  <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
-                    {event.type}
+                  <span className={`badge ${event.type === 'COMPETITION' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+                    {eventTypeTranslations[event.type] || event.type}
                   </span>
-                  <span className="badge badge-secondary">{event.activity}</span>
+                  <span className="badge badge-secondary">{activityTranslations[event.activity] || event.activity}</span>
                 </div>
               </div>
               
               <div className="space-y-3 text-base md:text-lg mt-4">
-                <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString("fr-FR", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString(lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
                 <p className="flex items-center"><MapPinIcon className="h-6 w-6 mr-3 text-primary" /> {event.location}</p>
-                <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> Distances: {event.distanceOptions.join(" / ")}</p>
-                <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> Participants: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
+                <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> {eventDetail.distances}: {event.distanceOptions.join(" / ")}</p>
+                <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> {eventDetail.attendees}: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
               </div>
             </div>
           </div>
@@ -104,11 +101,11 @@ export default async function EventDetail(props: EventDetailPageProps) {
           {event.eventLinks && event.eventLinks.length > 0 && (
             <div className="card bg-base-200 shadow-xl order-2">
               <div className="card-body">
-                <h2 className="card-title"><ArrowRightCircleIcon className="h-6 w-6 mr-2 text-primary" />Circuits<span className="text-sm font-normal italic ml-2">- Cliquer pour accéder au parcours ou description</span></h2>
+                <h2 className="card-title"><ArrowRightCircleIcon className="h-6 w-6 mr-2 text-primary" />{eventDetail.circuits}<span className="text-sm font-normal italic ml-2">{eventDetail.circuitsDescription}</span></h2>
                 <div className="flex flex-wrap gap-3 mt-2">
                   {event.eventLinks.map((link: any, index: number) => (
                     <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-secondary">
-                      {event.distanceOptions[index] || `Parcours ${index + 1}`}
+                      {event.distanceOptions[index] || `${eventDetail.route} ${index + 1}`}
                     </a>
                   ))}
                 </div>
@@ -119,7 +116,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
           {/* Mobile Order: 5 */}
           <div className="card bg-base-200 shadow-xl order-5">
             <div className="card-body">
-              <h2 className="card-title">Participants</h2>
+              <h2 className="card-title">{eventDetail.attendees}</h2>
               <AttendeesTableClient
                 eventId={event.id}
                 initialAttendeesList={event.attendeesList}
@@ -128,15 +125,13 @@ export default async function EventDetail(props: EventDetailPageProps) {
           </div>
         </div>
 
-        {/* --- Right Column ---
-            Behaves the same as the left column: `contents` on mobile, a flex column on desktop.
-        --- */}
+        {/* --- Right Column --- */}
         <div className="contents lg:w-1/3 lg:flex lg:flex-col lg:gap-6">
           {/* Mobile Order: 3 */}
           {event.seance && (
             <div className="card bg-base-200 shadow-xl order-3">
               <div className="card-body">
-                <h2 className="card-title"><ClipboardDocumentListIcon className="h-6 w-6 mr-2 text-primary" />Séance du jour</h2>
+                <h2 className="card-title"><ClipboardDocumentListIcon className="h-6 w-6 mr-2 text-primary" />{eventDetail.todaysSession}</h2>
                 <p className="whitespace-pre-line p-2 rounded-box mt-2">{event.seance}</p>
               </div>
             </div>
@@ -148,10 +143,10 @@ export default async function EventDetail(props: EventDetailPageProps) {
               <div className="collapse collapse-arrow bg-base-200 shadow-xl">
                 <input type="checkbox" />
                 <div className="collapse-title text-xl font-medium bg-success text-success-content">
-                  Vous êtes déjà inscrit !
+                  {eventDetail.alreadyRegistered}
                 </div>
                 <div className="collapse-content">
-                  <p className="pt-4">Vous pouvez inscrire une autre personne ci-dessous.</p>
+                  <p className="pt-4">{eventDetail.registerAnother}</p>
                    <RegistrationForm
                       eventId={event.id}
                       distanceOptions={event.distanceOptions}
@@ -163,7 +158,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
             ) : (
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
-                  <h2 className="card-title">S'inscrire à l'événement</h2>
+                  <h2 className="card-title">{eventDetail.registerForEvent}</h2>
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}

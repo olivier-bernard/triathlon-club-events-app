@@ -24,6 +24,19 @@ type Translations = {
     weekOf: string;
     noEventsThisWeek: string;
   };
+  eventDetail: {
+    back: string;
+    editEvent: string;
+    distances: string;
+    attendees: string;
+    circuits: string;
+    circuitsDescription: string;
+    route: string;
+    todaysSession: string;
+    alreadyRegistered: string;
+    registerAnother: string;
+    registerForEvent: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -61,6 +74,19 @@ export const translations: Record<string, Translations> = {
     calendar: {
       weekOf: "Week of",
       noEventsThisWeek: "No events for this week.",
+    },
+    eventDetail: {
+      back: "Back",
+      editEvent: "Edit Event",
+      distances: "Distances",
+      attendees: "Attendees",
+      circuits: "Routes",
+      circuitsDescription: "- Click to access the route or description",
+      route: "Route",
+      todaysSession: "Today's Session",
+      alreadyRegistered: "You are already registered!",
+      registerAnother: "You can register another person below.",
+      registerForEvent: "Register for the event",
     }
   },
   fr: {
@@ -97,6 +123,19 @@ export const translations: Record<string, Translations> = {
     calendar: {
       weekOf: "Semaine du",
       noEventsThisWeek: "Aucun événement pour cette semaine.",
+    },
+    eventDetail: {
+      back: "Retour",
+      editEvent: "Modifier l'événement",
+      distances: "Distances",
+      attendees: "Participants",
+      circuits: "Circuits",
+      circuitsDescription: "- Cliquer pour accéder au parcours ou description",
+      route: "Parcours",
+      todaysSession: "Séance du jour",
+      alreadyRegistered: "Vous êtes déjà inscrit !",
+      registerAnother: "Vous pouvez inscrire une autre personne ci-dessous.",
+      registerForEvent: "S'inscrire à l'événement",
     }
   },
 };
