@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { db } from "@/app/lib/db";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers"; // Import headers
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -66,14 +67,39 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
-      // On initial sign-in, populate the token with user data
+    async jwt({ token, user, trigger, session, isNewUser }) {
+      // --- This is the new logic for setting language ---
+      // On the very first sign-in for a new user
+      if (isNewUser && user) {
+        try {
+          // Read the 'Accept-Language' header from the browser request
+          const acceptLanguage = headers().get("accept-language");
+          const preferredLang = acceptLanguage?.split(',')[0].split('-')[0];
+          const supportedLangs = ['en', 'fr'];
+          const langToSet = supportedLangs.includes(preferredLang || '') ? preferredLang : 'en';
+
+          // Save the detected language to the database
+          await db.user.update({
+            where: { id: user.id },
+            data: { language: langToSet },
+          });
+          // Also update the token immediately
+          token.language = langToSet;
+        } catch (error) {
+          console.error("Failed to set initial language:", error);
+          // Default to 'fr' if header detection fails
+          token.language = 'fr';
+        }
+      }
+
+      // On subsequent sign-ins, populate the token with user data
       if (user) {
         token.id = user.id;
         token.name = user.displayName; // Use displayName from your DB model
         token.email = user.email;
         token.roles = user.roles;
         token.calendarView = user.calendarView;
+        token.language = user.language; // Ensure language is loaded into token
       }
 
       // When the session is updated (e.g., by calling `useSession().update()`),
@@ -107,6 +133,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.roles = token.roles as string[];
         session.user.calendarView = token.calendarView as boolean;
+        session.user.language = token.language as string; // Pass language to session
       }
       return session;
     },
