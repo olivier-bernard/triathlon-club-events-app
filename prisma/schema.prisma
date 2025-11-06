@@ -7,12 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Activity {
+  CYCLING
+  ROAD_RACING
+  TRAIL_RUNNING
+  SWIMMING
+  TRIATHLON
+  RUN_AND_BIKE
+  AQUATHLON
+}
+
+enum EventType {
+  TRAINING
+  COMPETITION
+}
+
 model Event {
   id              String   @id @default(uuid())
-  activity        String
+  activity        Activity
   date            DateTime
   time            DateTime?
-  type            String
+  type            EventType
   distanceOptions String[]
   eventLinks      String[]
   description     String

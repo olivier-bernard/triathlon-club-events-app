@@ -64,7 +64,6 @@ export default function RegistrationForm({ eventId, distanceOptions, groupLevels
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">S'enregistrer à l'événement</h2>
       {message && <p className={message.includes("successful") ? "text-success" : "text-error"}>{message}</p>}
 
       {/* Name Input Section */}

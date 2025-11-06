@@ -2,58 +2,58 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import type { Event } from "@/app/lib/types";
+import { type Event } from "@prisma/client";
 import EventList from "./EventList";
 import EventCalendar from "./EventCalendar";
-import { updateDisplayPreference } from "../profile/actions";
+import EventFilters from "./EventFilters";
 
 type EventsContainerProps = {
   initialEvents: Event[];
   isAdmin: boolean;
   initialView: 'list' | 'calendar';
+  lang: string;
 };
 
-export default function EventsContainer({ initialEvents, isAdmin, initialView }: EventsContainerProps) {
+export default function EventsContainer({ initialEvents, isAdmin, initialView, lang }: EventsContainerProps) {
   const [currentView, setView] = useState(initialView);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { update } = useSession();
 
   const handleSetView = async (view: 'list' | 'calendar') => {
     setView(view);
-    // Save the preference to the database
-    await updateDisplayPreference(view === 'calendar');
-    // Trigger a session update to refresh the JWT with the new preference
-    await update();
+    await update({ calendarView: view === 'calendar' });
   };
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => handleSetView("list")}
-          className={`btn btn-sm mr-2 transition-colors duration-200 ${
-            currentView === "list" 
-              ? "btn-primary font-bold" 
-              : "btn-outline hover:bg-primary hover:text-primary-content hover:border-primary"
-          }`}
-        >
-          List View
-        </button>
-        <button
-          onClick={() => handleSetView("calendar")}
-          className={`btn btn-sm transition-colors duration-200 ${
-            currentView === "calendar" 
-              ? "btn-primary font-bold" 
-              : "btn-outline hover:bg-primary hover:text-primary-content hover:border-primary"
-          }`}
-        >
-          Calendar View
-        </button>
+      {/* This single container now handles all layout states */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-y-4">
+        <EventFilters 
+          lang={lang} 
+          isOpen={isFilterOpen}
+          setIsOpen={setIsFilterOpen}
+        />
+
+        <div className="join">
+          <button
+            className={`join-item btn btn-sm ${currentView === 'list' ? 'btn-primary' : ''}`}
+            onClick={() => handleSetView('list')}
+          >
+            List View
+          </button>
+          <button
+            className={`join-item btn btn-sm ${currentView === 'calendar' ? 'btn-primary' : ''}`}
+            onClick={() => handleSetView('calendar')}
+          >
+            Calendar View
+          </button>
+        </div>
       </div>
 
-      {currentView === "list" ? (
+      {currentView === 'list' ? (
         <EventList events={initialEvents} isAdmin={isAdmin} />
       ) : (
-        <EventCalendar events={initialEvents} isAdmin={isAdmin} />
+        <EventCalendar events={initialEvents} />
       )}
     </div>
   );

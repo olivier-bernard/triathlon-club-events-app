@@ -1,10 +1,55 @@
 import { db } from "@/app/lib/db";
+import { Prisma, Activity, EventType } from "@prisma/client";
 
-export async function getEvents() {
-  return db.event.findMany({
-    include: { registrations: true },
-    orderBy: { date: "asc" },
-  });
+type GetEventsFilters = {
+  showPast?: boolean;
+  activity?: Activity;
+  type?: EventType;
+  fromDate?: string;
+  toDate?: string;
+};
+
+export async function getEvents(filters: GetEventsFilters = {}) {
+  const { showPast, activity, type, fromDate, toDate } = filters;
+
+  const where: Prisma.EventWhereInput = {};
+
+  // Default to upcoming events unless showPast is true
+  if (!showPast) {
+    where.date = {
+      gte: new Date(new Date().setHours(0, 0, 0, 0)), // Start of today
+    };
+  }
+
+  if (activity) {
+    where.activity = activity;
+  }
+
+  if (type) {
+    where.type = type;
+  }
+
+  // Handle date range filtering
+  if (fromDate || toDate) {
+    where.date = {
+      ...where.date as Prisma.DateTimeFilter, // Keep the gte from above if it exists
+      gte: fromDate ? new Date(fromDate) : (where.date as Prisma.DateTimeFilter)?.gte,
+      lte: toDate ? new Date(toDate) : undefined,
+    };
+  }
+
+  try {
+    const events = await db.event.findMany({
+      where,
+      orderBy: {
+        date: "asc",
+      },
+    });
+    return events;
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+    return [];
+  }
 }
 
 export async function getEventById(id: string) {
