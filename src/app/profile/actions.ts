@@ -1,32 +1,44 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { db } from "@/app/lib/db";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { db } from "@/app/lib/db";
+import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
-export async function updateProfileInfo(_previousState: any, formData: FormData) {
+export async function updateProfileInfo(prevState: any, formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { error: "Not authenticated" };
 
   const displayName = formData.get("displayName") as string;
   const email = formData.get("email") as string;
+  const language = formData.get("language") as string; // Read the language from the form
 
   try {
     await db.user.update({
       where: { id: session.user.id },
-      data: { displayName, email },
+      data: {
+        displayName,
+        email,
+        language, // Add language to the data being updated
+      },
     });
-    revalidatePath("/profile"); // Refresh the data on the profile page
-    revalidatePath("/", "layout"); // Revalidate the root layout to update NavBar
-    return { success: "Profile updated successfully." };
+
+    revalidatePath("/profile");
+    // We need to revalidate the root layout as well to update the language in the navbar
+    revalidatePath("/"); 
+    return { success: "Profile updated successfully!" };
   } catch (error) {
+    console.error("Error updating profile:", error);
+    // Check for unique constraint violation on email
+    if ((error as any).code === 'P2002' && (error as any).meta?.target?.includes('email')) {
+      return { error: "This email address is already in use." };
+    }
     return { error: "Failed to update profile." };
   }
 }
 
-export async function changePassword(_previousState: any, formData: FormData) {
+export async function changePassword(prevState: any, formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return { error: "Not authenticated" };
 
@@ -39,7 +51,7 @@ export async function changePassword(_previousState: any, formData: FormData) {
     return { error: "Passwords do not match." };
   }
 
-  try {
+  try {AbortController
     const user = await db.user.findUnique({ where: { id: parseInt(session.user.id) } });
     if (!user) return { error: "User not found." };
 

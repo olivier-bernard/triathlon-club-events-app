@@ -37,6 +37,32 @@ type Translations = {
     registerAnother: string;
     registerForEvent: string;
   };
+  eventForm: {
+    // Define the structure for event form translations
+  };
+  adminUsers: {
+    title: string;
+    username: string;
+    displayName: string;
+    email: string;
+    active: string;
+    delete: string;
+  };
+  profilePage: {
+    title: string;
+    infoTitle: string;
+    adminUser: string;
+    displayName: string;
+    email: string;
+    language: string;
+    saveChanges: string;
+    changePasswordTitle: string;
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+    passwordsDoNotMatch: string;
+    updatePassword: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -87,6 +113,32 @@ export const translations: Record<string, Translations> = {
       alreadyRegistered: "You are already registered!",
       registerAnother: "You can register another person below.",
       registerForEvent: "Register for the event",
+    },
+    eventForm: {
+      // English translations for event form
+    },
+    adminUsers: {
+      title: "User Management",
+      username: "Username",
+      displayName: "Display Name",
+      email: "Email",
+      active: "Active",
+      delete: "Delete",
+    },
+    profilePage: {
+      title: "Your Profile",
+      infoTitle: "Profile Information",
+      adminUser: "Admin User",
+      displayName: "Display Name",
+      email: "Email Address",
+      language: "Language",
+      saveChanges: "Save Changes",
+      changePasswordTitle: "Change Password",
+      currentPassword: "Current Password",
+      newPassword: "New Password",
+      confirmNewPassword: "Confirm New Password",
+      passwordsDoNotMatch: "Passwords do not match.",
+      updatePassword: "Update Password",
     }
   },
   fr: {
@@ -136,6 +188,32 @@ export const translations: Record<string, Translations> = {
       alreadyRegistered: "Vous êtes déjà inscrit !",
       registerAnother: "Vous pouvez inscrire une autre personne ci-dessous.",
       registerForEvent: "S'inscrire à l'événement",
+    },
+    eventForm: {
+      // French translations for event form
+    },
+    adminUsers: {
+      title: "Gestion des utilisateurs",
+      username: "Nom d'utilisateur",
+      displayName: "Nom d'affichage",
+      email: "Email",
+      active: "Actif",
+      delete: "Supprimer",
+    },
+    profilePage: {
+      title: "Votre profil",
+      infoTitle: "Informations du profil",
+      adminUser: "Utilisateur Admin",
+      displayName: "Nom d'affichage",
+      email: "Adresse e-mail",
+      language: "Langue",
+      saveChanges: "Enregistrer",
+      changePasswordTitle: "Changer le mot de passe",
+      currentPassword: "Mot de passe actuel",
+      newPassword: "Nouveau mot de passe",
+      confirmNewPassword: "Confirmer le nouveau mot de passe",
+      passwordsDoNotMatch: "Les mots de passe ne correspondent pas.",
+      updatePassword: "Mettre à jour le mot de passe",
     }
   },
 };

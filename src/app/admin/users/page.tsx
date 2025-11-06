@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/app/lib/db";
 import { toggleUserActive, deleteUser } from "./actions";
+import { getTranslations } from "@/app/lib/i18n";
 
 function ToggleActiveForm({ user }: { user: any }) {
     return (
@@ -21,7 +22,8 @@ function ToggleActiveForm({ user }: { user: any }) {
     );
 }
 
-function DeleteUserButton({ user, currentUserId }: { user: any, currentUserId: number }) {
+// Correct the prop type for currentUserId to string
+function DeleteUserButton({ user, currentUserId }: { user: any, currentUserId: string }) {
     // Prevent an admin from deleting their own account
     if (user.id === currentUserId) {
         return null;
@@ -43,35 +45,39 @@ export default async function AdminUsersPage() {
         redirect("/");
     }
 
+    const lang = session?.user?.language || 'fr';
+    const { adminUsers } = getTranslations(lang);
+
     const users = await db.user.findMany({
         orderBy: { username: 'asc' },
     });
 
     return (
         <div className="container mx-auto p-4 md:p-8">
-            <h1 className="text-3xl font-bold mb-8">User Management</h1>
+            <h1 className="text-3xl font-bold mb-8">{adminUsers.title}</h1>
             <div className="overflow-x-auto">
                 <table className="table w-full">
                     <thead>
                         <tr>
-                            <th>Username</th>
-                            <th>Display Name</th>
-                            <th>Email</th>
-                            <th className="text-center">Active</th>
-                            <th className="text-center">Delete</th>
+                            <th>{adminUsers.username}</th>
+                            <th>{adminUsers.displayName}</th>
+                            <th>{adminUsers.email}</th>
+                            <th className="text-center">{adminUsers.active}</th>
+                            <th className="text-center">{adminUsers.delete}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
                             <tr key={user.id}>
-                                <td>{user.username}</td>
+                                <td>{user.name}</td>
                                 <td>{user.displayName}</td>
                                 <td>{user.email}</td>
                                 <td className="text-center">
                                     <ToggleActiveForm user={user} />
                                 </td>
                                 <td className="text-center">
-                                    <DeleteUserButton user={user} currentUserId={parseInt(session.user.id)} />
+                                    {/* Remove the incorrect parseInt */}
+                                    <DeleteUserButton user={user} currentUserId={session.user.id} />
                                 </td>
                             </tr>
                         ))}

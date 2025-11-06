@@ -2,8 +2,10 @@
 
 import { useActionState, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from 'next/navigation'; // 1. Import the router
 import { updateProfileInfo, changePassword } from "./actions";
 import type { User } from "@prisma/client";
+import { getTranslations } from "@/app/lib/i18n";
 
 function SubmitButton({ text, disabled }: { text: string; disabled?: boolean }) {
   const { pending } = useFormStatus();
@@ -14,27 +16,60 @@ function SubmitButton({ text, disabled }: { text: string; disabled?: boolean }) 
   );
 }
 
-export function ProfileInfoForm({ user }: { user: User }) {
+export function ProfileInfoForm({ user, lang }: { user: User, lang: string }) {
+  const { profilePage } = getTranslations(lang);
   const [state, formAction] = useActionState(updateProfileInfo, null);
+  const [selectedLanguage, setSelectedLanguage] = useState(user.language || 'fr');
+  const router = useRouter(); // 2. Get the router instance
+
+  // This effect correctly syncs the dropdown with the user prop
+  useEffect(() => {
+    if (user.language) {
+      setSelectedLanguage(user.language);
+    }
+  }, [user.language]);
+
+  // --- THIS IS THE FIX ---
+  // 3. This new effect watches for a successful form submission.
+  // When it sees the success message from the server action, it tells
+  // the browser to refresh the data for the current page.
+  useEffect(() => {
+    if (state?.success) {
+      router.refresh();
+    }
+  }, [state?.success, router]);
 
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title">Profile Information for {user.username}</h2>
+        <h2 className="card-title">{profilePage.infoTitle}</h2>
         <form action={formAction} className="space-y-4">
           {user.roles?.includes("admin") && (
-            <div className="badge badge-info badge-outline">Admin User</div>
+            <div className="badge badge-info badge-outline">{profilePage.adminUser}</div>
           )}
           <div>
-            <label className="label"><span className="label-text">Display Name</span></label>
-            <input name="displayName" type="text" defaultValue={user.displayName} className="input input-bordered w-full" />
+            <label className="label"><span className="label-text">{profilePage.displayName}</span></label>
+            <input name="displayName" type="text" defaultValue={user.displayName || ""} className="input input-bordered w-full" />
           </div>
           <div>
-            <label className="label"><span className="label-text">Email Address</span></label>
+            <label className="label"><span className="label-text">{profilePage.email}</span></label>
             <input name="email" type="email" defaultValue={user.email || ""} className="input input-bordered w-full" />
           </div>
+          <div>
+            <label className="label"><span className="label-text">{profilePage.language}</span></label>
+            {/* Use `value` and `onChange` to make this a controlled component */}
+            <select 
+              name="language" 
+              className="select select-bordered w-full" 
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+            >
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+            </select>
+          </div>
           <div className="card-actions justify-end">
-            <SubmitButton text="Save Changes" />
+            <SubmitButton text={profilePage.saveChanges} />
           </div>
           {state?.error && <p className="text-sm text-error">{state.error}</p>}
           {state?.success && <p className="text-sm text-success">{state.success}</p>}
@@ -44,7 +79,8 @@ export function ProfileInfoForm({ user }: { user: User }) {
   );
 }
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ lang }: { lang: string }) {
+  const { profilePage } = getTranslations(lang);
   const [state, formAction] = useActionState(changePassword, null);
 
   // State for live password matching feedback
@@ -70,16 +106,16 @@ export function ChangePasswordForm() {
     <div className="collapse collapse-arrow bg-base-100 shadow-xl">
       <input type="checkbox" />
       <div className="collapse-title text-xl font-medium">
-        Change Password
+        {profilePage.changePasswordTitle}
       </div>
       <div className="collapse-content">
         <form action={formAction} className="space-y-4 pt-4">
           <div>
-            <label className="label"><span className="label-text">Current Password</span></label>
+            <label className="label"><span className="label-text">{profilePage.currentPassword}</span></label>
             <input name="currentPassword" type="password" className="input input-bordered w-full" required />
           </div>
           <div>
-            <label className="label"><span className="label-text">New Password</span></label>
+            <label className="label"><span className="label-text">{profilePage.newPassword}</span></label>
             <input
               name="newPassword"
               type="password"
@@ -90,7 +126,7 @@ export function ChangePasswordForm() {
             />
           </div>
           <div>
-            <label className="label"><span className="label-text">Confirm New Password</span></label>
+            <label className="label"><span className="label-text">{profilePage.confirmNewPassword}</span></label>
             <input
               name="confirmPassword"
               type="password"
@@ -99,10 +135,10 @@ export function ChangePasswordForm() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-            {!passwordsMatch && <p className="mt-1 text-xs text-error">Passwords do not match.</p>}
+            {!passwordsMatch && <p className="mt-1 text-xs text-error">{profilePage.passwordsDoNotMatch}</p>}
           </div>
           <div className="card-actions justify-end">
-            <SubmitButton text="Update Password" disabled={!passwordsMatch} />
+            <SubmitButton text={profilePage.updatePassword} disabled={!passwordsMatch} />
           </div>
           {state?.error && <p className="text-sm text-error">{state.error}</p>}
           {state?.success && <p className="text-sm text-success">{state.success}</p>}
