@@ -1,23 +1,32 @@
+import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  CalendarDaysIcon,
+  ClockIcon,
+  MapPinIcon,
+  UsersIcon,
+  ClipboardDocumentListIcon,
+  InformationCircleIcon,
+  FlagIcon,
+  ArrowRightCircleIcon,
+} from "@heroicons/react/24/outline";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getEventById } from "@/app/lib/queries/events";
 import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";
-import Link from "next/link";
-import { EventWithRegistrations } from "@/app/lib/types"; // <-- Import the new type
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface EventDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
+export default async function EventDetail(props: EventDetailPageProps) {
+  const params = await props.params;
+  const { id } = params;
+  // Fetch data sequentially to resolve the sync-dynamic-apis error.
+  const event = await getEventById(id);
+  const session = await getServerSession(authOptions);
 
-export default async function EventDetail({ params }: EventDetailPageProps) {
-  const inputParams = await params;
-  const [event, session] = await Promise.all([
-    getEventById(inputParams.id),
-    getServerSession(authOptions)
-  ]);
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
 
   if (!event) {
@@ -26,129 +35,133 @@ export default async function EventDetail({ params }: EventDetailPageProps) {
 
   const isUserRegistered = session?.user
     ? event.attendeesList.some(attendeeString => {
-      try {
-        const attendee = JSON.parse(attendeeString);
-        // Compare the userId from the registration with the session user's id
-        return attendee.userId && attendee.userId === session.user.id;
-      } catch {
-        return false; // Ignore malformed JSON strings
-      }
-    })
+        try {
+          const attendee = JSON.parse(attendeeString);
+          return attendee.userId && attendee.userId === session.user.id;
+        } catch {
+          return false;
+        }
+      })
     : false;
 
+  // Helper function for border color, same as in EventCard
+  const getBorderColor = () => {
+    if (event.type === 'Competition') return 'border-red-500';
+    if (event.activity === 'Natation') return 'border-blue-500';
+    if (event.type === 'Entrainement') return 'border-green-500';
+    return 'border-transparent';
+  };
+
   return (
-    <>
-      <div className="container mx-auto p-1 md:p-8">
-        <div className="flex justify-between items-center mb-2">
-          <Link href="/events" className="btn btn-primary rounded-box">
-            ← Retour à la liste des événements
+    <div className="container mx-auto p-4 md:p-8">
+      {/* --- Header --- */}
+      <div className="flex justify-between items-center mb-6">
+        <Link href="/" className="btn btn-outline btn-primary rounded-box">
+          ← Retour
+        </Link>
+        {isAdmin && (
+          <Link href={`/admin/events/${event.id}/edit`} className="btn btn-primary">
+            Modifier l'événement
           </Link>
-          {isAdmin && (
-            <Link href={`/admin/events/${event.id}/edit`} className="btn btn-outline btn-primary">
-              Edit Event
-            </Link>
-          )}
-        </div>
-
-        {/* Event Details */}
-        <div className="bg-base-200 rounded-box shadow-md pt-1 pb-1 px-6 mb-4">
-          <h2 className="text-lg font-bold">{event.activity}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-base">
-            <p>Date: {new Date(event.date).toLocaleDateString()}</p>
-            <p>Heure: {new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
-            <p>Distances Options: {event.distanceOptions.join("/")}</p>
-            <p>Description: {event.description}</p>
-            <p>Lieu: {event.location}</p>
-            <p>
-              Participants: {event.attendees}
-              {event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}
-            </p>
-          </div>
-        </div >
-
-        {/* Paper for Circuits */}
-        <div className="bg-base-200 rounded-box shadow-md pt-1 pb-1 px-6 mb-4">
-          <div className="flex items-center justify-start mb-2">
-            <h2 className="text-lg font-semibold mr-2">Circuits</h2>
-            <p className="text-sm italic">- Cliquer pour accéder au fichier GPX</p>
-          </div>
-          <table className="table-auto w-full text-center">
-            <tbody>
-              <tr>
-                {event.distanceOptions.map((distance, index) => (
-                  <td key={index} className="py-2">
-                    <a
-                      href={event.eventLinks[index]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {distance} km
-                    </a>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-
-        {/* Conditionally display the 'seance' field */}
-        {event.seance && (
-          <div className="bg-base-200 rounded-box shadow-md pt-1 pb-1 px-6 mb-2">
-            <div className="mt-2">
-              <h2 className="text-lg font-semibold mb-1">Séance du jour :</h2>
-              {/* whitespace-pre-line preserves line breaks from your data */}
-              <p className="whitespace-pre-line p-2 rounded-box">
-                {event.seance}
-              </p>
-            </div>
-          </div >
         )}
+      </div>
 
-        {isUserRegistered ? (
-          <div className="collapse collapse-arrow bg-base-200 my-6 shadow-md">
-            <input type="checkbox" />
-            <div className="collapse-title text-xl font-medium bg-success text-success-content">
-              Vous êtes déjà inscrit ! (Cliquer pour inscrire une autre personne ?)
+      {/* --- Main Content Grid --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
+        {/* --- Left Column: Event Info & Attendees --- */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className={`card bg-base-200 shadow-xl border-l-4 ${getBorderColor()}`}>
+            <div className="card-body">
+              <div className="flex justify-between items-start mb-2">
+                <h1 className="card-title text-3xl md:text-4xl font-bold">{event.description}</h1>
+                <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
+                  <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+                    {event.type}
+                  </span>
+                  <span className="badge badge-secondary">{event.activity}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3 text-base md:text-lg mt-4">
+                <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString("fr-FR", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
+                <p className="flex items-center"><MapPinIcon className="h-6 w-6 mr-3 text-primary" /> {event.location}</p>
+                <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> Distances: {event.distanceOptions.join(" / ")}</p>
+                <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> Participants: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
+              </div>
             </div>
-            <div className="collapse-content">
-              <div className="w-full pt-6">
+          </div>
+
+          {event.eventLinks && event.eventLinks.length > 0 && (
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title"><ArrowRightCircleIcon className="h-6 w-6 mr-2 text-primary" />Circuits<span className="text-sm font-normal italic ml-2">- Cliquer pour accéder au parcours ou description</span></h2>
+                <div className="flex flex-wrap gap-3 mt-2">
+                  {event.eventLinks.map((link: any, index: number) => (
+                    <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-secondary">
+                      {event.distanceOptions[index] || `Parcours ${index + 1}`}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* On mobile, this will appear after the registration block */}
+          <div className="card bg-base-200 shadow-xl order-3 lg:order-2">
+            <div className="card-body">
+              <h2 className="card-title">Participants</h2>
+              <AttendeesTableClient
+                eventId={event.id}
+                initialAttendeesList={event.attendeesList}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- Right Column: Registration & Seance --- */}
+        {/* On mobile, this will appear before the participants list */}
+        <div className="lg:col-span-1 space-y-6 mt-6 lg:mt-0 order-2 lg:order-3">
+          {isUserRegistered ? (
+            <div className="collapse collapse-arrow bg-base-200 shadow-xl">
+              <input type="checkbox" />
+              <div className="collapse-title text-xl font-medium bg-success text-success-content">
+                Vous êtes déjà inscrit !
+              </div>
+              <div className="collapse-content">
+                <p className="pt-4">Vous pouvez inscrire une autre personne ci-dessous.</p>
+                 <RegistrationForm
+                    eventId={event.id}
+                    distanceOptions={event.distanceOptions}
+                    groupLevels={event.groupLevels || undefined}
+                    user={null} // Forcing registration for another person
+                  />
+              </div>
+            </div>
+          ) : (
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">S'inscrire à l'événement</h2>
                 <RegistrationForm
                   eventId={event.id}
                   distanceOptions={event.distanceOptions}
                   groupLevels={event.groupLevels || undefined}
-                  user={session?.user ? {
-                    id: session.user.id,
-                    displayName: session.user.name || "",
-                    email: session.user.email || ""
-                  } : null}
-                  defaultToManual={true}
+                  user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
                 />
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="w-4/5 md:w-3/5 mx-auto mb-6">
-            <RegistrationForm
-              eventId={event.id}
-              distanceOptions={event.distanceOptions}
-              groupLevels={event.groupLevels || undefined}
-              user={session?.user ? {
-                id: session.user.id,
-                displayName: session.user.name || "",
-                email: session.user.email || ""
-              } : null}
-            />
-          </div>
-        )}
+          )}
 
-
-        <AttendeesTableClient
-          eventId={event.id}
-          initialAttendeesList={event.attendeesList}
-        />
+          {event.seance && (
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title"><ClipboardDocumentListIcon className="h-6 w-6 mr-2 text-primary" />Séance du jour</h2>
+                <p className="whitespace-pre-line p-2 rounded-box mt-2">{event.seance}</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
