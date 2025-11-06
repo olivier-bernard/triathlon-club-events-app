@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Event } from "@/app/lib/types";
+import { getTranslations } from "../lib/i18n"; // Import the translation function
 
 // --- ICONS ---
 const CalendarIcon = () => (
@@ -20,9 +21,13 @@ const RoadIcon = () => (
 type EventCardProps = {
   event: Event;
   isAdmin: boolean;
+  lang: string; // Add lang prop
 };
 
-const EventCard: React.FC<EventCardProps> = ({ event, isAdmin }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, isAdmin, lang }) => {
+  // Get the translation maps for the current language
+  const { activityTranslations, eventTypeTranslations } = getTranslations(lang);
+
   const dateStr = new Date(event.date).toLocaleDateString("fr-FR", {
     year: '2-digit',
     month: '2-digit',
@@ -38,9 +43,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin }) => {
   }) : '';
 
   const getBorderColor = () => {
-    if (event.type === 'Competition') return 'border-red-500';
-    if (event.activity === 'Natation') return 'border-blue-500';
-    if (event.type === 'Entrainement') return 'border-green-500';
+    if (event.type === 'COMPETITION') return 'border-red-500';
+    if (event.activity === 'SWIMMING') return 'border-blue-500';
+    if (event.type === 'TRAINING') return 'border-green-500';
     return 'border-transparent';
   };
 
@@ -72,10 +77,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin }) => {
               {timeStr && <span>- {timeStr}</span>}
             </div>
             <div className="flex items-center gap-2">
-              <span className={`badge ${event.type === 'Competition' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
-                {event.type}
+              {/* Use the translated value for event type */}
+              <span className={`badge ${event.type === 'COMPETITION' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+                {eventTypeTranslations[event.type] || event.type}
               </span>
-              <span className="badge badge-secondary">{event.activity}</span>
+              {/* Use the translated value for event activity */}
+              <span className="badge badge-secondary">
+                {activityTranslations[event.activity] || event.activity}
+              </span>
             </div>
           </div>
 

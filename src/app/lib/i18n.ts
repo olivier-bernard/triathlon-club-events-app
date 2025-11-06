@@ -11,6 +11,14 @@ type Translations = {
     all: string;
     upcomingEvents: string;
     allEvents: string;
+    displayFilters: string;
+    hideFilters: string;
+  };
+  homePage: {
+    createEvent: string;
+    allEvents: string;
+    cycling: string;
+    competitions: string;
   };
 };
 
@@ -39,6 +47,12 @@ export const translations: Record<string, Translations> = {
       allEvents: "All Events",
       displayFilters: "Display Filters",
       hideFilters: "Hide Filters",
+    },
+    homePage: {
+      createEvent: "Create Event",
+      allEvents: "All Events",
+      cycling: "Cycling",
+      competitions: "Competitions",
     }
   },
   fr: {
@@ -65,6 +79,12 @@ export const translations: Record<string, Translations> = {
       allEvents: "Tous les événements",
       displayFilters: "Afficher les filtres",
       hideFilters: "Masquer les filtres",
+    },
+    homePage: {
+      createEvent: "Créer un événement",
+      allEvents: "Tous les événements",
+      cycling: "Cyclisme",
+      competitions: "Compétitions",
     }
   },
 };

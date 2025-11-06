@@ -10,37 +10,53 @@ type GetEventsFilters = {
 };
 
 export async function getEvents(filters: GetEventsFilters = {}) {
+
   const { showPast, activity, type, fromDate, toDate } = filters;
 
-  const where: Prisma.EventWhereInput = {};
+  // Use an array to build the query conditions
+  const andConditions: Prisma.EventWhereInput[] = [];
 
   // Default to upcoming events unless showPast is true
   if (!showPast) {
-    where.date = {
-      gte: new Date(new Date().setHours(0, 0, 0, 0)), // Start of today
-    };
+    andConditions.push({
+      date: {
+        gte: new Date(new Date().setHours(0, 0, 0, 0)), // Start of today
+      },
+    });
   }
 
+  if (fromDate) {
+    andConditions.push({
+      date: {
+        gte: new Date(fromDate),
+      },
+    });
+  }
+
+  if (toDate) {
+    andConditions.push({
+      date: {
+        lte: new Date(toDate),
+      },
+    });
+  }
+
+  // Only apply the activity filter if it's a non-empty string
   if (activity) {
-    where.activity = activity;
+    andConditions.push({ activity: activity });
   }
 
+  // Only apply the type filter if it's a non-empty string
   if (type) {
-    where.type = type;
-  }
-
-  // Handle date range filtering
-  if (fromDate || toDate) {
-    where.date = {
-      ...where.date as Prisma.DateTimeFilter, // Keep the gte from above if it exists
-      gte: fromDate ? new Date(fromDate) : (where.date as Prisma.DateTimeFilter)?.gte,
-      lte: toDate ? new Date(toDate) : undefined,
-    };
+    andConditions.push({ type: type });
   }
 
   try {
     const events = await db.event.findMany({
-      where,
+      // Combine all conditions with AND
+      where: {
+        AND: andConditions,
+      },
       orderBy: {
         date: "asc",
       },

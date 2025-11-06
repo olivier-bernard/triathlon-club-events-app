@@ -14,33 +14,48 @@
 // 
 
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { getUpcomingEvents } from "./lib/queries/events";
-import EventsContainer from "./components/EventsContainer";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { getTranslations } from "./lib/i18n";
+import { AllIcon, BikeIcon, TrophyIcon } from "./components/icons/icons";
 
 export const dynamic = 'force-dynamic';
 
-export default async function EventsPage() {
+export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
-  const events = await getUpcomingEvents();
-
-  const userPrefersCalendar = session?.user?.calendarView ?? false;
-
-  const safeEvents = events.map((event) => ({
-    ...event,
-    date: event.date.toISOString(),
-    time: event.time?.toISOString() ?? null,
-  }));
+  const lang = session?.user?.language || 'fr';
+  const { homePage } = getTranslations(lang);
 
   return (
-    <div className="container mx-auto px-2 py-4">
-      <h1 className="text-2xl font-bold mb-4">Événements à venir</h1>
-      <EventsContainer
-        initialEvents={safeEvents}
-        isAdmin={isAdmin}
-        initialView={userPrefersCalendar ? 'calendar' : 'list'}
-      />
+    <div className="container mx-auto px-4 py-8 flex flex-col justify-center items-center h-full flex-grow">
+      
+      {/* Admin "Create Event" Button at the top */}
+      {isAdmin && (
+        <div className="w-full flex justify-center mb-12">
+          <Link href="/admin/events/new" className="btn btn-ghost text-lg">
+            <PlusCircleIcon className="h-6 w-6 mr-2" />
+            {homePage.createEvent}
+          </Link>
+        </div>
+      )}
+
+      {/* Main Navigation Buttons */}
+      <div className="w-full md:w-auto flex flex-col md:flex-row gap-6 md:gap-10">
+        <Link href="/events" className="btn btn-primary btn-lg text-xl h-20">
+          <AllIcon className="h-8 w-8 mr-3" />
+          {homePage.allEvents}
+        </Link>
+        <Link href="/events?activity=CYCLING" className="btn btn-secondary btn-lg text-xl h-20">
+          <BikeIcon className="h-8 w-8 mr-3" />
+          {homePage.cycling}
+        </Link>
+        <Link href="/events?type=COMPETITION" className="btn btn-accent btn-lg text-xl h-20">
+          <TrophyIcon className="h-8 w-8 mr-3" />
+          {homePage.competitions}
+        </Link>
+      </div>
     </div>
   );
 }
