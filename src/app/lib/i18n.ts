@@ -63,6 +63,14 @@ type Translations = {
     passwordsDoNotMatch: string;
     updatePassword: string;
   };
+  navBar: {
+    admin: string;
+    addEvent: string;
+    manageUsers: string;
+    signedInAs: string;
+    profile: string;
+    logout: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -139,6 +147,14 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       passwordsDoNotMatch: "Passwords do not match.",
       updatePassword: "Update Password",
+    },
+    navBar: {
+      admin: "Admin",
+      addEvent: "Add Event",
+      manageUsers: "Manage Users",
+      signedInAs: "Signed in as {username}",
+      profile: "Profile",
+      logout: "Logout",
     }
   },
   fr: {
@@ -214,6 +230,14 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       passwordsDoNotMatch: "Les mots de passe ne correspondent pas.",
       updatePassword: "Mettre à jour le mot de passe",
+    },
+    navBar: {
+      admin: "Admin",
+      addEvent: "Ajouter un événement",
+      manageUsers: "Gérer les utilisateurs",
+      signedInAs: "Connecté en tant que {username}",
+      profile: "Profil",
+      logout: "Déconnexion",
     }
   },
 };

@@ -2,14 +2,19 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
+import { getTranslations } from "../lib/i18n";
 
 export default async function NavBar() {
   const session = await getServerSession(authOptions);
 
-  // If there's no session, don't render the navbar (or render a different one)
+  // If there's no session, don't render the navbar
   if (!session) {
     return null;
   }
+
+  // Get language and translations
+  const lang = session?.user?.language || 'fr';
+  const { navBar } = getTranslations(lang);
 
   return (
     <div className="navbar bg-base-100 shadow-md px-4">
@@ -25,17 +30,17 @@ export default async function NavBar() {
         {session.user?.roles?.includes('admin') && (
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost text-xl">
-              Admin
+              {navBar.admin}
             </label>
             <ul
               tabIndex={0}
               className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
-                <Link href="/admin/events/new" className="text-base">Add Event</Link>
+                <Link href="/admin/events/new" className="text-base">{navBar.addEvent}</Link>
               </li>
               <li>
-                <Link href="/admin/users" className="text-base">Manage Users</Link>
+                <Link href="/admin/users" className="text-base">{navBar.manageUsers}</Link>
               </li>
             </ul>
           </div>
@@ -56,13 +61,13 @@ export default async function NavBar() {
             className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
           >
             <li className="menu-title">
-              <span>Signed in as {session.user?.name}</span>
+              <span>{navBar.signedInAs.replace('{username}', session.user?.name || '')}</span>
             </li>
             <li>
-              <Link href="/profile" className="text-base">Profile</Link>
+              <Link href="/profile" className="text-base">{navBar.profile}</Link>
             </li>
     
-            <LogoutButton />
+            <LogoutButton lang={lang} />
           </ul>
         </div>
       </div>
