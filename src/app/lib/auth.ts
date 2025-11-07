@@ -51,12 +51,12 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session, isNewUser }) {
       if (isNewUser && user) {
         try {
-          const acceptLanguage = headers().get("accept-language");
+          const acceptLanguage = (await headers()).get("accept-language");
           const preferredLang = acceptLanguage?.split(',')[0].split('-')[0];
           const supportedLangs = ['en', 'fr'];
           const langToSet = supportedLangs.includes(preferredLang || '') ? preferredLang : 'en';
           await db.user.update({
-            where: { id: user.id },
+            where: { id: user.id as number },
             data: { language: langToSet },
           });
           token.language = langToSet;
@@ -75,19 +75,45 @@ export const authOptions: NextAuthOptions = {
         token.language = user.language;
       }
 
+      // Handle session updates (e.g., from useSession().update())
       if (trigger === "update" && session) {
-        const dbUser = await db.user.findUnique({
-          where: { id: token.id as number },
-        });
-        if (dbUser) {
-          token.name = dbUser.displayName;
-          token.email = dbUser.email;
-          token.calendarView = dbUser.calendarView;
-          token.language = dbUser.language; 
+        try {
+          // Prepare the data object for database update
+          const updateData: any = {};
+          
+          // Check which fields are being updated
+          if (session.calendarView !== undefined) {
+            updateData.calendarView = session.calendarView;
+            token.calendarView = session.calendarView;
+          }
+          
+          // Only update the database if there are changes
+          if (Object.keys(updateData).length > 0) {
+            await db.user.update({
+              where: { id: token.id as number },
+              data: updateData,
+            });
+          }
+          
+          // Fetch the latest user data to ensure token is in sync
+          const dbUser = await db.user.findUnique({
+            where: { id: token.id as number },
+          });
+          
+          if (dbUser) {
+            token.name = dbUser.displayName;
+            token.email = dbUser.email;
+            token.calendarView = dbUser.calendarView;
+            token.language = dbUser.language;
+          }
+        } catch (error) {
+          console.error("Failed to update user session:", error);
         }
       }
+      
       return token;
     },
+    
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as number;
