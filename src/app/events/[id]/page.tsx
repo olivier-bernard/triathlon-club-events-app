@@ -16,6 +16,8 @@ import { getEventById } from "@/app/lib/queries/events";
 import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import { getTranslations } from "@/app/lib/i18n";
+import EventChat from "@/app/components/EventChat";
+import { getMessagesByEventId } from "@/app/lib/queries/messages";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
@@ -24,9 +26,11 @@ interface EventDetailPageProps {
 export default async function EventDetail(props: EventDetailPageProps) {
   const params = await props.params;
   const { id } = params;
-  // Fetch data sequentially to resolve the sync-dynamic-apis error.
+  // Fetch data sequentially
   const event = await getEventById(id);
   const session = await getServerSession(authOptions);
+  const userIdAsNumber = session?.user?.id ? parseInt(String(session.user.id), 10) : undefined;
+  const messages = await getMessagesByEventId(id, userIdAsNumber); // Fetch messages
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
@@ -169,6 +173,17 @@ export default async function EventDetail(props: EventDetailPageProps) {
               </div>
             )}
           </div>
+
+          {/* Mobile Order: 6 - NEW CHAT COMPONENT */}
+          {session?.user && (
+            <div className="order-6 mt-6 lg:mt-0">
+              <EventChat 
+                eventId={event.id}
+                currentUserId={userIdAsNumber}
+                initialMessages={JSON.parse(JSON.stringify(messages))} // Serialize date objects
+              />
+            </div>
+          )}
         </div>
 
       </div>
