@@ -209,6 +209,15 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       updatePasswordButton: "Update Password",
       returnToLogin: "Return to login",
+    },
+    chat: {
+      title: "Discussion",
+      startConversation: "Be the first to send a message",
+      noMessages: "No messages yet.",
+      writeMessage: "Write a message...",
+      privateNote: "Private Note",
+      send: "Send",
+      privateIndicator: "Private note",
     }
   },
   fr: {
@@ -319,6 +328,15 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       updatePasswordButton: "Mettre à jour",
       returnToLogin: "Retour à la connexion",
+    },
+    chat: {
+      title: "Discussion",
+      startConversation: "Soyez le premier à envoyer un message",
+      noMessages: "Aucun message pour le moment.",
+      writeMessage: "Écrire un message...",
+      privateNote: "Note privée",
+      send: "Envoyer",
+      privateIndicator: "Note privée",
     }
   },
 };

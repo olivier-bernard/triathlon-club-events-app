@@ -34,7 +34,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
-  const { eventDetail, eventTypeTranslations, activityTranslations } = getTranslations(lang);
+  const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 
   if (!event) {
     return notFound();
@@ -181,6 +181,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                 eventId={event.id}
                 currentUserId={userIdAsNumber}
                 initialMessages={JSON.parse(JSON.stringify(messages))} // Serialize date objects
+                translations={chatTranslations}
               />
             </div>
           )}
