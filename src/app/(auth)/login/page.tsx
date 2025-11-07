@@ -2,28 +2,54 @@
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { getTranslations, type Translations } from "@/app/lib/i18n";
 
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
-    const router = useRouter();
+  const router = useRouter();
   const { status } = useSession();
 
-      if (status === "authenticated") {
-      router.replace("/");
-    }
+  // Initialize state to null until the language is detected.
+  const [t, setT] = useState<Translations['authPages'] | null>(null);
+
+  // Detect browser language on component mount
+  useEffect(() => {
+    // This code only runs on the client, after the component mounts.
+    const browserLang = navigator.language.split('-')[0];
+    const newLang = ['en', 'fr'].includes(browserLang) ? browserLang : 'fr';
+    
+    // This log will appear in your BROWSER's developer console (F12).
+    console.log("Detected browser language:", browserLang, "Using language:", newLang);
+    
+    setT(getTranslations(newLang).authPages);
+  }, []);
+
+  if (status === "authenticated") {
+    router.replace("/");
+  }
+
+  // While translations are loading, show a spinner or nothing to prevent the flash.
+  if (!t) {
+    return (
+      <div className="auth-card flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="auth-card">
         <h2 className="mb-6 text-center text-2xl font-bold">
-          Sign in to your account
+          {t.signInTitle}
         </h2>
 
         {error && (
           <div className="mb-4 rounded-md bg-red-100 p-3 text-center text-sm text-red-700">
-            Login failed. Please check your credentials.
+            {t.loginFailed}
           </div>
         )}
 
@@ -44,7 +70,7 @@ export default function LoginPage() {
               htmlFor="username"
               className="block text-sm font-medium"
             >
-              Username
+              {t.username}
             </label>
             <input
               id="username"
@@ -52,7 +78,7 @@ export default function LoginPage() {
               type="text"
               required
               className="input input-bordered w-full"
-              placeholder="your_username"
+              placeholder={t.usernamePlaceholder}
             />
           </div>
 
@@ -62,13 +88,13 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium"
               >
-                Password
+                {t.password}
               </label>
               <Link
                 href="/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
-                Forgot password?
+                {t.forgotPasswordLink}
               </Link>
             </div>
             <input
@@ -81,11 +107,11 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className="btn btn-primary w-full">
-            Sign In
+            {t.signInButton}
           </button>
         </form>
 
-        <div className="divider my-6">Or sign in with</div>
+        <div className="divider my-6">{t.orSignInWith}</div>
 
         <div className="space-y-3">
           <button
@@ -93,16 +119,16 @@ export default function LoginPage() {
             className="btn btn-outline w-full"
           >
             {/* You can add a Google icon here */}
-            Sign in with Google
+            {t.signInWithGoogle}
           </button>
           {/* Add other providers like Microsoft here */}
         </div>
       </div>
 
       <p className="mt-8 text-center text-sm">
-        New user?{" "}
+        {t.newUserPrompt}{" "}
         <Link href="/register" className="font-medium text-primary hover:underline">
-          Register
+          {t.registerLink}
         </Link>
       </p>
     </>

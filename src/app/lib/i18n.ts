@@ -71,6 +71,33 @@ type Translations = {
     profile: string;
     logout: string;
   };
+  authPages: {
+    signInTitle: string;
+    loginFailed: string;
+    username: string;
+    usernamePlaceholder: string;
+    password: string;
+    forgotPasswordLink: string;
+    signInButton: string;
+    orSignInWith: string;
+    signInWithGoogle: string;
+    newUserPrompt: string;
+    registerLink: string;
+    registerTitle: string;
+    email: string;
+    displayName: string;
+    registerButton: string;
+    alreadyHaveAccountPrompt: string;
+    signInLink: string;
+    forgotPasswordTitle: string;
+    forgotPasswordInstructions: string;
+    sendResetLinkButton: string;
+    resetPasswordTitle: string;
+    newPassword: string;
+    confirmNewPassword: string;
+    updatePasswordButton: string;
+    returnToLogin: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -155,6 +182,33 @@ export const translations: Record<string, Translations> = {
       signedInAs: "Signed in as {username}",
       profile: "Profile",
       logout: "Logout",
+    },
+    authPages: {
+      signInTitle: "Sign in to your account",
+      loginFailed: "Login failed. Please check your credentials.",
+      username: "Username",
+      usernamePlaceholder: "your_username",
+      password: "Password",
+      forgotPasswordLink: "Forgot password?",
+      signInButton: "Sign In",
+      orSignInWith: "Or sign in with",
+      signInWithGoogle: "Sign in with Google",
+      newUserPrompt: "New user?",
+      registerLink: "Register",
+      registerTitle: "Create a new account",
+      email: "Email Address",
+      displayName: "Display Name",
+      registerButton: "Create Account",
+      alreadyHaveAccountPrompt: "Already have an account?",
+      signInLink: "Sign In",
+      forgotPasswordTitle: "Forgot Your Password?",
+      forgotPasswordInstructions: "Enter your email address and we will send you a link to reset your password.",
+      sendResetLinkButton: "Send Reset Link",
+      resetPasswordTitle: "Reset Your Password",
+      newPassword: "New Password",
+      confirmNewPassword: "Confirm New Password",
+      updatePasswordButton: "Update Password",
+      returnToLogin: "Return to login",
     }
   },
   fr: {
@@ -238,6 +292,33 @@ export const translations: Record<string, Translations> = {
       signedInAs: "Connecté en tant que {username}",
       profile: "Profil",
       logout: "Déconnexion",
+    },
+    authPages: {
+      signInTitle: "Connectez-vous à votre compte",
+      loginFailed: "La connexion a échoué. Veuillez vérifier vos identifiants.",
+      username: "Nom d'utilisateur",
+      usernamePlaceholder: "votre_nom_d_utilisateur",
+      password: "Mot de passe",
+      forgotPasswordLink: "Mot de passe oublié ?",
+      signInButton: "Se connecter",
+      orSignInWith: "Ou se connecter avec",
+      signInWithGoogle: "Se connecter avec Google",
+      newUserPrompt: "Nouvel utilisateur ?",
+      registerLink: "S'inscrire",
+      registerTitle: "Créer un nouveau compte",
+      email: "Adresse e-mail",
+      displayName: "Nom d'affichage",
+      registerButton: "Créer le compte",
+      alreadyHaveAccountPrompt: "Vous avez déjà un compte ?",
+      signInLink: "Se connecter",
+      forgotPasswordTitle: "Mot de passe oublié ?",
+      forgotPasswordInstructions: "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      sendResetLinkButton: "Envoyer le lien",
+      resetPasswordTitle: "Réinitialiser votre mot de passe",
+      newPassword: "Nouveau mot de passe",
+      confirmNewPassword: "Confirmer le nouveau mot de passe",
+      updatePasswordButton: "Mettre à jour",
+      returnToLogin: "Retour à la connexion",
     }
   },
 };
