@@ -21,6 +21,7 @@ model Event {
   attendeesLimit  Int
   attendees       Int
   seance          String?
+  Message         Message[]
   registrations   Registration[]
 }
 
@@ -74,6 +75,7 @@ model User {
   image               String?
   language            String               @default("fr")
   accounts            Account[]
+  Message             Message[]
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
 }
@@ -84,5 +86,16 @@ model PasswordResetToken {
   expires   DateTime
   userId    Int
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+  eventId   String
+  userId    Int
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
