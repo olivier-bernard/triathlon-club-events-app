@@ -1,4 +1,3 @@
-import React from "react";
 import EventCard from "./EventCard";
 import type { Event } from "@/app/lib/types"; 
 

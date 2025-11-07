@@ -23,7 +23,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@types/node": "^14.0.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.2.2",
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.24",

@@ -2,7 +2,7 @@
 import { db } from "@/app/lib/db";
 import { updateEvent, getEventById } from "@/app/lib/queries/events";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
 
 const MANUAL_ENTRY_KEY = "manual";

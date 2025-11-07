@@ -11,7 +11,7 @@ import {
   FlagIcon,
   ArrowRightCircleIcon,
 } from "@heroicons/react/24/outline";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import { getEventById } from "@/app/lib/queries/events";
 import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";

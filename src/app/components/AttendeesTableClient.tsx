@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import AttendeesTable from "./AttendeesTable";
 import { handleDelete } from "@/app/events/[id]/actions";
-import { useSession } from "next-auth/react";
 
 interface AttendeesTableClientProps {
   eventId: string;

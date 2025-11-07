@@ -15,7 +15,7 @@
 
 import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { getTranslations } from "./lib/i18n";
 import { AllIcon, BikeIcon, TrophyIcon } from "./components/icons/icons";
