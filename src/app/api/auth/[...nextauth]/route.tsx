@@ -105,7 +105,6 @@ export const authOptions: NextAuthOptions = {
       // When the session is updated (e.g., by calling `useSession().update()`),
       // fetch the latest user data from the DB and update the token.
       if (trigger === "update" && session) {
-        // **This is the new part**: Check if calendarView is being updated and save it to the DB.
         if (typeof session.calendarView === 'boolean') {
           await db.user.update({
             where: { id: token.id as string },
@@ -118,12 +117,13 @@ export const authOptions: NextAuthOptions = {
           where: { id: token.id as string },
         });
         if (dbUser) {
-          token.name = dbUser.displayName; // Use displayName from your DB model
+          token.name = dbUser.displayName; // Use displayName from DB model
           token.email = dbUser.email;
           token.calendarView = dbUser.calendarView;
+          token.language = dbUser.language; 
         }
       }
-      
+
       return token;
     },
     async session({ session, token }) {

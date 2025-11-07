@@ -2,7 +2,8 @@
 
 import { useActionState, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { useRouter } from 'next/navigation'; // 1. Import the router
+import { useSession } from "next-auth/react"; // 1. Import useSession
+import { useRouter } from 'next/navigation';
 import { updateProfileInfo, changePassword } from "./actions";
 import type { User } from "@prisma/client";
 import { getTranslations } from "@/app/lib/i18n";
@@ -20,24 +21,33 @@ export function ProfileInfoForm({ user, lang }: { user: User, lang: string }) {
   const { profilePage } = getTranslations(lang);
   const [state, formAction] = useActionState(updateProfileInfo, null);
   const [selectedLanguage, setSelectedLanguage] = useState(user.language || 'fr');
-  const router = useRouter(); // 2. Get the router instance
+  const router = useRouter();
+  const { update } = useSession();
 
-  // This effect correctly syncs the dropdown with the user prop
   useEffect(() => {
     if (user.language) {
       setSelectedLanguage(user.language);
     }
   }, [user.language]);
 
-  // --- THIS IS THE FIX ---
-  // 3. This new effect watches for a successful form submission.
-  // When it sees the success message from the server action, it tells
-  // the browser to refresh the data for the current page.
   useEffect(() => {
-    if (state?.success) {
-      router.refresh();
-    }
-  }, [state?.success, router]);
+    // Define an async function to handle the update process
+    const handleSuccess = async () => {
+      if (state?.success) {
+        // 1. First, AWAIT the session update. This ensures the session token
+        //    on the server is fresh before we do anything else.
+        await update({ language: selectedLanguage });
+
+        // 2. THEN, refresh the page. Now when the server re-fetches data,
+        //    getServerSession() will receive the new, correct token.
+        router.refresh();
+      }
+    };
+
+    handleSuccess();
+    // We only want this effect to run when `state.success` changes.
+    // The other dependencies are stable and can be removed to prevent accidental re-runs.
+  }, [state?.success]);
 
   return (
     <div className="card bg-base-100 shadow-xl">
