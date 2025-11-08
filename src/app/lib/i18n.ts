@@ -1,8 +1,7 @@
-import { Activity, EventType } from "@prisma/client";
 
 type Translations = {
-  activityTranslations: Record<Activity, string>;
-  eventTypeTranslations: Record<EventType, string>;
+  activityTranslations: Record<string, string>;
+  eventTypeTranslations: Record<string, string>;
   filterLabels: {
     activity: string;
     type: string;
@@ -122,6 +121,15 @@ type Translations = {
   eventsContainer: {
     listView: string;
     calendarView: string;
+  };
+  chat: {
+    title: string;
+    startConversation: string;
+    noMessages: string;
+    writeMessage: string;
+    privateNote: string;
+    send: string;
+    privateIndicator: string;
   };
 };
 

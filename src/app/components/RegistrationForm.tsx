@@ -7,7 +7,6 @@ import { useFormStatus } from "react-dom";
 interface RegistrationFormProps {
   eventId: string;
   distanceOptions: string[];
-  groupLevels?: string[];
   user: {
     id: string;
     displayName: string;
@@ -31,11 +30,11 @@ function SubmitButton() {
   );
 }
 
-export default function RegistrationForm({ eventId, distanceOptions, groupLevels, user, defaultToManual = false }: RegistrationFormProps) {
+export default function RegistrationForm({ eventId, distanceOptions, user, defaultToManual = false }: RegistrationFormProps) {
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
-  const [groupLevel, setGroupLevel] = useState(groupLevels?.[0] || "A");
-    const [nameSelection, setNameSelection] = useState(() => {
+  const [groupLevel, setGroupLevel] = useState("1");
+  const [nameSelection, setNameSelection] = useState(() => {
     if (defaultToManual) {
       return MANUAL_ENTRY_KEY;
     }
@@ -77,7 +76,7 @@ export default function RegistrationForm({ eventId, distanceOptions, groupLevels
             onChange={(e) => setNameSelection(e.target.value)}
           >
             <option value={user.displayName}>{user.displayName}</option>
-            <option value={MANUAL_ENTRY_KEY}>Entrer manuellement un autre aathlète</option>
+            <option value={MANUAL_ENTRY_KEY}>Entrer manuellement un autre athlète</option>
           </select>
         ) : null}
         {isManualEntry && (
@@ -117,7 +116,7 @@ export default function RegistrationForm({ eventId, distanceOptions, groupLevels
           className="select select-bordered"
           required
         >
-          {(groupLevels || ["1", "2", "3"]).map((level) => (
+          {["1", "2", "3"].map((level) => (
             <option key={level} value={level}>{level}</option>
           ))}
         </select>

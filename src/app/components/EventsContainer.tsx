@@ -67,7 +67,7 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
           // Ensure the 'lang' prop is passed to EventList
           <EventList events={events} isAdmin={isAdmin} lang={lang} />
         ) : (
-          <EventCalendar events={events} />
+          <EventCalendar events={events} isAdmin={isAdmin} lang={lang} />
         )}
       </div>
     </div>

@@ -38,7 +38,10 @@ export const authOptions: NextAuthOptions = {
           const passwordMatch = await bcrypt.compare(credentials.password, user.password);
           if (!passwordMatch) return null;
           if (!user.active) return null;
-          return user;
+          return {
+            ...user,
+            id: String(user.id), // Convert id to string
+          };
         } catch (error) {
           console.error("Error during authorization:", error);
           return null;
@@ -48,15 +51,15 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user, trigger, session, isNewUser }) {
-      if (isNewUser && user) {
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
         try {
           const acceptLanguage = (await headers()).get("accept-language");
           const preferredLang = acceptLanguage?.split(',')[0].split('-')[0];
           const supportedLangs = ['en', 'fr'];
           const langToSet = supportedLangs.includes(preferredLang || '') ? preferredLang : 'en';
           await db.user.update({
-            where: { id: user.id as number },
+            where: { id: user.id as string },
             data: { language: langToSet },
           });
           token.language = langToSet;
@@ -67,7 +70,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (user) {
-        token.id = user.id;
+        token.id = String(user.id); // Ensure id is a string
         token.name = user.displayName;
         token.email = user.email;
         token.roles = user.roles;
@@ -90,14 +93,14 @@ export const authOptions: NextAuthOptions = {
           // Only update the database if there are changes
           if (Object.keys(updateData).length > 0) {
             await db.user.update({
-              where: { id: token.id as number },
+              where: { id: token.id as string },
               data: updateData,
             });
           }
           
           // Fetch the latest user data to ensure token is in sync
           const dbUser = await db.user.findUnique({
-            where: { id: token.id as number },
+            where: { id: token.id as string },
           });
           
           if (dbUser) {
@@ -116,9 +119,9 @@ export const authOptions: NextAuthOptions = {
     
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as number;
+        session.user.id = token.id as string; // Ensure id is a string
         session.user.name = token.name;
-        session.user.email = token.email;
+        session.user.email = token.email ?? null;
         session.user.roles = token.roles as string[];
         session.user.calendarView = token.calendarView as boolean;
         session.user.language = token.language as string;

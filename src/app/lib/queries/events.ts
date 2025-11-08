@@ -1,10 +1,10 @@
 import { db } from "@/app/lib/db";
-import { Prisma, Activity, EventType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 type GetEventsFilters = {
   showPast?: boolean;
-  activity?: Activity;
-  type?: EventType;
+  activity?: string;
+  type?: string;
   fromDate?: string;
   toDate?: string;
 };

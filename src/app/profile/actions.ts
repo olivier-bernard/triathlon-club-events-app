@@ -52,7 +52,7 @@ export async function changePassword(prevState: any, formData: FormData) {
   }
 
   try {AbortController
-    const user = await db.user.findUnique({ where: { id: parseInt(session.user.id) } });
+    const user = await db.user.findUnique({ where: { id: session.user.id } });
     if (!user) return { error: "User not found." };
 
     // This is the logic that securely checks the user's current password.
@@ -63,7 +63,7 @@ export async function changePassword(prevState: any, formData: FormData) {
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     await db.user.update({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       data: { password: hashedNewPassword },
     });
 

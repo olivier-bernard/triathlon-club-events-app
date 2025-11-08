@@ -33,7 +33,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
   const messages = await getMessagesByEventId(id, userIdAsNumber); // Fetch messages
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
-  const lang = (session?.user as { language?: string })?.language || 'fr';
+  const lang = session?.user?.language || 'fr';
   const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 
   if (!event) {
@@ -154,7 +154,6 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
-                    groupLevels={event.groupLevels || undefined}
                     user={null} // Forcing registration for another person
                   />
                 </div>
@@ -166,7 +165,6 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
-                    groupLevels={event.groupLevels || undefined}
                     user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
                   />
                 </div>

@@ -2,7 +2,6 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import { Activity, EventType } from "@prisma/client";
 import { getTranslations } from "../lib/i18n";
 
 type EventFiltersProps = {
@@ -16,8 +15,8 @@ export default function EventFilters({ lang }: EventFiltersProps) {
   const searchParams = useSearchParams();
 
   const { activityTranslations, eventTypeTranslations, filterLabels } = getTranslations(lang);
-  const activityOptions = Object.keys(activityTranslations) as Activity[];
-  const typeOptions = Object.keys(eventTypeTranslations) as EventType[];
+  const activityOptions = Object.keys(activityTranslations) as string[];
+  const typeOptions = Object.keys(eventTypeTranslations) as string[];
 
   const createQueryString = useCallback(
     (name: string, value: string) => {

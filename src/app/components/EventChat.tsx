@@ -3,6 +3,7 @@
 import { createMessage } from "@/app/lib/actions/messages";
 import { PaperAirplaneIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRef, useTransition, useEffect } from "react"; // Import useEffect
+import ChatLocalTime from "./ChatLocalTime"; // Add this import
 
 // Define the type for a message based on what getMessagesByEventId returns
 type Message = {
@@ -82,12 +83,9 @@ function ChatMessage({ message, currentUserId, translations }: { message: Messag
     <div className={`chat ${chatAlignment}`}>
       <div className="chat-header flex items-center gap-2 pb-1">
         {message.user.displayName}
-        <time className="text-xs opacity-50">
-          {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </time>
+        <ChatLocalTime date={message.createdAt.toString()} /> {/* Use client component for local time */}
         {message.isPrivate && <LockClosedIcon className="h-3 w-3 text-warning" title={translations.privateIndicator} />}
       </div>
-      {/* Added whitespace-pre-line to preserve line breaks */}
       <div className={`chat-bubble ${bubbleColor} whitespace-pre-line`}>{message.content}</div>
     </div>
   );

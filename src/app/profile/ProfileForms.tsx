@@ -5,8 +5,9 @@ import { useFormStatus } from "react-dom";
 import { useSession } from "next-auth/react"; // 1. Import useSession
 import { useRouter } from 'next/navigation';
 import { updateProfileInfo, changePassword } from "./actions";
-import type { User } from "@prisma/client";
 import { getTranslations } from "@/app/lib/i18n";
+// I would like to import USER from '@/types/next-auth.d.ts'
+import { User } from 'next-auth';
 
 function SubmitButton({ text, disabled }: { text: string; disabled?: boolean }) {
   const { pending } = useFormStatus();
@@ -17,7 +18,7 @@ function SubmitButton({ text, disabled }: { text: string; disabled?: boolean }) 
   );
 }
 
-export function ProfileInfoForm({ user, lang }: { user: User, lang: string }) {
+export function ProfileInfoForm({ user, lang }: { user: User; lang: string }) {
   const { profilePage } = getTranslations(lang);
   const [state, formAction] = useActionState(updateProfileInfo, null);
   const [selectedLanguage, setSelectedLanguage] = useState(user.language || 'fr');

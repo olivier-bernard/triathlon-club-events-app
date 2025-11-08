@@ -15,7 +15,7 @@ export interface Registration {
   createdAt: Date;
 }
 
-export interface User {
+export interface AppUser {
   id: string;
   username: string;
   email: string;

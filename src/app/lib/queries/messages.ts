@@ -19,23 +19,20 @@ export async function getMessagesByEventId(eventId: string, userId?: number) {
       eventId,
       OR: [
         { isPrivate: false },
-        { 
-          isPrivate: true,
-          userId: userId,
-        }
+        { isPrivate: true, userId: String(userId) } // Ensure userId is a string
       ]
     },
     include: {
       user: {
         select: {
           id: true,
-          displayName: true,
-        },
-      },
+          displayName: true
+        }
+      }
     },
     orderBy: {
-      createdAt: "asc",
-    },
+      createdAt: "asc"
+    }
   });
   return messages;
 }
