@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import EventForm from "../../EventForm";
 import { PrismaClient } from "@prisma/client";
@@ -16,13 +16,15 @@ type EditEventPageProps = {
 export default async function EditEventPage(props: EditEventPageProps) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
+  const lang = session?.user?.language || 'fr';
+
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/");
   }
 
   const event = await prisma.event.findUnique({
     where: {
-      id: params.id, 
+      id: params.id,
     },
   });
 
@@ -30,5 +32,5 @@ export default async function EditEventPage(props: EditEventPageProps) {
     notFound();
   }
 
-  return <EventForm event={event} />;
+  return <EventForm event={event} lang={lang} />;
 }

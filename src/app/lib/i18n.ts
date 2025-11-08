@@ -38,7 +38,28 @@ type Translations = {
     registerForEvent: string;
   };
   eventForm: {
-    // Define the structure for event form translations
+    editTitle: string;
+    createTitle: string;
+    cancel: string;
+    mainDetails: string;
+    description: string;
+    activity: string;
+    selectActivity: string;
+    type: string;
+    date: string;
+    time: string;
+    location: string;
+    contentAndOptions: string;
+    seance: string;
+    attendeesLimit: string;
+    linksAndDistances: string;
+    distanceOptions: string;
+    distancePlaceholder: string;
+    commaSeparated: string;
+    eventLinks: string;
+    linksPlaceholder: string;
+    updateButton: string;
+    createButton: string;
   };
   adminUsers: {
     title: string;
@@ -150,7 +171,28 @@ export const translations: Record<string, Translations> = {
       registerForEvent: "Register for the event",
     },
     eventForm: {
-      // English translations for event form
+      editTitle: "Edit Event",
+      createTitle: "Create New Event",
+      cancel: "Cancel",
+      mainDetails: "Main Details",
+      description: "Description (Main Title)",
+      activity: "Activity",
+      selectActivity: "Select an activity",
+      type: "Type",
+      date: "Date",
+      time: "Time (24h format)",
+      location: "Location",
+      contentAndOptions: "Content & Options",
+      seance: "Training Session (Optional)",
+      attendeesLimit: "Attendees Limit (0 for unlimited)",
+      linksAndDistances: "Links & Distances",
+      distanceOptions: "Distance Options",
+      distancePlaceholder: "e.g., 10km, 21km, 42km",
+      commaSeparated: "Separate values with a comma",
+      eventLinks: "Event Links (GPX, etc.)",
+      linksPlaceholder: "e.g., https://..., https://...",
+      updateButton: "Update Event",
+      createButton: "Create Event",
     },
     adminUsers: {
       title: "User Management",
@@ -269,7 +311,28 @@ export const translations: Record<string, Translations> = {
       registerForEvent: "S'inscrire à l'événement",
     },
     eventForm: {
-      // French translations for event form
+      editTitle: "Modifier l'événement",
+      createTitle: "Créer un nouvel événement",
+      cancel: "Annuler",
+      mainDetails: "Détails principaux",
+      description: "Description (Titre principal)",
+      activity: "Activité",
+      selectActivity: "Sélectionnez une activité",
+      type: "Type",
+      date: "Date",
+      time: "Heure (format 24h)",
+      location: "Lieu",
+      contentAndOptions: "Contenu & Options",
+      seance: "Séance d'entraînement (Optionnel)",
+      attendeesLimit: "Limite de participants (0 pour illimité)",
+      linksAndDistances: "Parcours & Distances",
+      distanceOptions: "Options de distance",
+      distancePlaceholder: "ex: 10km, 21km, 42km",
+      commaSeparated: "Séparez les valeurs par une virgule",
+      eventLinks: "Liens de l'événement (GPX, etc.)",
+      linksPlaceholder: "ex: https://..., https://...",
+      updateButton: "Mettre à jour",
+      createButton: "Créer l'événement",
     },
     adminUsers: {
       title: "Gestion des utilisateurs",
