@@ -14,6 +14,10 @@ type Translations = {
     displayFilters: string;
     hideFilters: string;
   };
+  eventsContainer: {
+    listView: string;
+    calendarView: string;
+  };
   homePage: {
     createEvent: string;
     allEvents: string;
@@ -146,6 +150,10 @@ export const translations: Record<string, Translations> = {
       allEvents: "All Events",
       displayFilters: "Display Filters",
       hideFilters: "Hide Filters",
+    },
+    eventsContainer: {
+      listView: "List View",
+      calendarView: "Calendar View",
     },
     homePage: {
       createEvent: "Create Event",
@@ -286,6 +294,10 @@ export const translations: Record<string, Translations> = {
       allEvents: "Tous les événements",
       displayFilters: "Afficher les filtres",
       hideFilters: "Masquer les filtres",
+    },
+    eventsContainer: {
+      listView: "Liste",
+      calendarView: "Calendrier",
     },
     homePage: {
       createEvent: "Créer un événement",

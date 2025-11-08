@@ -23,7 +23,7 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
   const { update } = useSession();
   
   // Use the 'lang' prop directly for translations
-  const { filterLabels } = getTranslations(lang);
+  const { filterLabels, eventsContainer } = getTranslations(lang);
 
   useEffect(() => {
     setEvents(initialEvents);
@@ -48,13 +48,13 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
             className={`join-item btn btn-sm ${currentView === 'list' ? 'btn-primary' : ''}`}
             onClick={() => handleSetView('list')}
           >
-            List View
+            {eventsContainer.listView}
           </button>
           <button
             className={`join-item btn btn-sm ${currentView === 'calendar' ? 'btn-primary' : ''}`}
             onClick={() => handleSetView('calendar')}
           >
-            Calendar View
+            {eventsContainer.calendarView}
           </button>
         </div>
       </div>

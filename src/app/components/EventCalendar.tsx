@@ -11,7 +11,7 @@ import { getTranslations } from "../lib/i18n"; // Import translations
 // Update props to accept lang
 export default function EventCalendar({ events, isAdmin, lang }: { events: Event[], isAdmin: boolean, lang: string }) {
   const [activeDate, setActiveDate] = useState(new Date());
-  const { calendar } = getTranslations(lang); // Get calendar translations
+  const { calendar } = getTranslations(lang); 
 
   // --- Helper functions ---
   function getEventsForDate(date: Date) {
