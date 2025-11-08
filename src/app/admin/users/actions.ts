@@ -16,9 +16,9 @@ async function verifyAdmin() {
 export async function toggleUserActive(formData: FormData) {
     console.log("toggleUserActive called");
     const session = await verifyAdmin();
-    const userId = parseInt(formData.get("userId") as string);
+    const userId = formData.get("userId") as string;
 
-    if (userId === parseInt(session.user.id)) {
+    if (userId === session.user.id) {
         throw new Error("Admins cannot deactivate their own account.");
     }
 
@@ -34,9 +34,9 @@ export async function toggleUserActive(formData: FormData) {
 
 export async function deleteUser(formData: FormData) {
     const session = await verifyAdmin();
-    const userId = parseInt(formData.get("userId") as string);
+    const userId = formData.get("userId") as string;
 
-    if (userId === parseInt(session.user.id)) {
+    if (userId === session.user.id) {
         throw new Error("Admins cannot delete their own account.");
     }
 

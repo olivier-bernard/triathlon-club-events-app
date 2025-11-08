@@ -9,7 +9,7 @@ import { authOptions } from "@/app/lib/auth"; // Corrected import path
 export async function createMessage(formData: FormData) {
   const session = await getServerSession(authOptions);
   // The user ID from the session can be a string or number depending on the adapter
-  const userId = session?.user?.id ? parseInt(String(session.user.id), 10) : null;
+  const userId = session?.user?.id ? String(session.user.id) : null;
 
   if (!userId) {
     throw new Error("You must be logged in to post a message.");
