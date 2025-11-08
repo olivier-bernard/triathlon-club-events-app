@@ -119,6 +119,10 @@ type Translations = {
     updatePasswordButton: string;
     returnToLogin: string;
   };
+  eventsContainer: {
+    listView: string;
+    calendarView: string;
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -251,6 +255,10 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       updatePasswordButton: "Update Password",
       returnToLogin: "Return to login",
+    },
+    eventsContainer: {
+      listView: "List View",
+      calendarView: "Calendar View",
     },
     chat: {
       title: "Discussion",
@@ -391,6 +399,10 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       updatePasswordButton: "Mettre à jour",
       returnToLogin: "Retour à la connexion",
+    },
+    eventsContainer: {
+      listView: "Liste",
+      calendarView: "Calendrier",
     },
     chat: {
       title: "Discussion",

@@ -33,7 +33,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
   const messages = await getMessagesByEventId(id, userIdAsNumber); // Fetch messages
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
-  const lang = session?.user?.language || 'fr';
+  const lang = (session?.user as { language?: string })?.language || 'fr';
   const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 
   if (!event) {
@@ -42,13 +42,13 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
   const isUserRegistered = session?.user
     ? event.attendeesList.some(attendeeString => {
-        try {
-          const attendee = JSON.parse(attendeeString);
-          return attendee.userId && attendee.userId === session.user.id;
-        } catch {
-          return false;
-        }
-      })
+      try {
+        const attendee = JSON.parse(attendeeString);
+        return attendee.userId && attendee.userId === session.user.id;
+      } catch {
+        return false;
+      }
+    })
     : false;
 
   // Helper function for border color, updated to use enum keys
@@ -75,7 +75,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
       {/* --- Main Content Container --- */}
       <div className="grid lg:flex lg:gap-8">
-        
+
         {/* --- Left Column --- */}
         <div className="contents lg:w-2/3 lg:flex lg:flex-col lg:gap-6">
           {/* Mobile Order: 1 */}
@@ -90,7 +90,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <span className="badge badge-secondary">{activityTranslations[event.activity] || event.activity}</span>
                 </div>
               </div>
-              
+
               <div className="space-y-3 text-base md:text-lg mt-4">
                 <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString(lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
@@ -151,12 +151,12 @@ export default async function EventDetail(props: EventDetailPageProps) {
                 </div>
                 <div className="collapse-content">
                   <p className="pt-4">{eventDetail.registerAnother}</p>
-                   <RegistrationForm
-                      eventId={event.id}
-                      distanceOptions={event.distanceOptions}
-                      groupLevels={event.groupLevels || undefined}
-                      user={null} // Forcing registration for another person
-                    />
+                  <RegistrationForm
+                    eventId={event.id}
+                    distanceOptions={event.distanceOptions}
+                    groupLevels={event.groupLevels || undefined}
+                    user={null} // Forcing registration for another person
+                  />
                 </div>
               </div>
             ) : (
@@ -177,7 +177,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
           {/* Mobile Order: 6 - NEW CHAT COMPONENT */}
           {session?.user && (
             <div className="order-6 mt-6 lg:mt-0">
-              <EventChat 
+              <EventChat
                 eventId={event.id}
                 currentUserId={userIdAsNumber}
                 initialMessages={JSON.parse(JSON.stringify(messages))} // Serialize date objects

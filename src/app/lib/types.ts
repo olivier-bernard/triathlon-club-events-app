@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { type User as PrismaUser } from "@prisma/client";
+import { DefaultSession } from "next-auth";
 
 export interface Event {
   id: string;

@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email is required." }, { status: 400 });
     }
 
-    const user = await db.user.findUnique({ where: { email } });
+    const user = await db.user.findFirst({ where: { email } });
 
     // IMPORTANT: Always return a success message, even if the user is not found.
     // This prevents attackers from checking which emails are registered.
