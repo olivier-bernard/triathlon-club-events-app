@@ -44,7 +44,6 @@ export async function createEvent(prevState: { message: string }, formData: Form
 
         const { date, time, ...data } = validatedFields.data;
         const eventDate = new Date(date);
-        const [hours, minutes] = time.split(':').map(Number);
         let eventTime: Date | null = null;
         if (time) {
             const [hours, minutes] = time.split(':').map(Number);
@@ -86,14 +85,12 @@ export async function updateEvent(prevState: { message: string }, formData: Form
         }
 
         const eventDate = new Date(date);
-        const [hours, minutes] = time.split(':').map(Number);
         let eventTime: Date | null = null;
         if (time) {
             const [hours, minutes] = time.split(':').map(Number);
             eventTime = new Date(date);
             eventTime.setUTCHours(hours, minutes, 0, 0);
         }
-
         await prisma.event.update({
             where: { id },
             data: {

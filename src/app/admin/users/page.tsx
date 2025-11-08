@@ -69,7 +69,7 @@ export default async function AdminUsersPage() {
                     <tbody>
                         {users.map((user) => (
                             <tr key={user.id}>
-                                <td>{user.name}</td>
+                                <td>{user.username}</td>
                                 <td>{user.displayName}</td>
                                 <td>{user.email}</td>
                                 <td className="text-center">

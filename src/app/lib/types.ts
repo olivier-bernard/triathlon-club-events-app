@@ -5,7 +5,7 @@ export interface Event {
   id: string;
   activity: string;
   date: Date;
-  time: Date;
+  time: Date | null;
   type: string;
   location: string;
   description: string;
