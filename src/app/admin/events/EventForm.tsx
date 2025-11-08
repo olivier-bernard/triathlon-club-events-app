@@ -68,7 +68,7 @@ export default function EventForm({ event, lang }: EventFormProps) {
                             {/* Type */}
                             <div className="form-control">
                                 <label htmlFor="type" className="label"><span className="label-text">{t.type}</span></label>
-                                <select id="type" name="type" className="select select-bordered w-full" value={eventType} onChange={(e) => setEventType(e.target.value as EventType)} required>
+                                <select id="type" name="type" className="select select-bordered w-full" value={eventType} onChange={(e) => setEventType(e.target.value)} required>
                                     {eventTypeKeys.map((type) => (
                                         <option key={type} value={type}>
                                             {translations.eventTypeTranslations[type as keyof typeof translations.eventTypeTranslations]}
@@ -125,14 +125,14 @@ export default function EventForm({ event, lang }: EventFormProps) {
                             {/* Distance Options */}
                             <div className="form-control">
                                 <label htmlFor="distanceOptions" className="label"><span className="label-text">{t.distanceOptions}</span></label>
-                                <input type="text" id="distanceOptions" name="distanceOptions" className="input input-bordered w-full" defaultValue={event?.distanceOptions.join(", ") || ""} placeholder={t.distancePlaceholder} />
+                                <input type="text" id="distanceOptions" name="distanceOptions" className="input input-bordered w-full" defaultValue={event?.distanceOptions?.join(", ") || ""} placeholder={t.distancePlaceholder} />
                                 <label className="label"><span className="label-text-alt">{t.commaSeparated}</span></label>
                             </div>
 
                             {/* Event Links */}
                             <div className="form-control">
                                 <label htmlFor="eventLinks" className="label"><span className="label-text">{t.eventLinks}</span></label>
-                                <input type="text" id="eventLinks" name="eventLinks" className="input input-bordered w-full" defaultValue={event?.eventLinks.join(", ") || ""} placeholder={t.linksPlaceholder}/>
+                                <input type="text" id="eventLinks" name="eventLinks" className="input input-bordered w-full" defaultValue={event?.eventLinks?.join(", ") || ""} placeholder={t.linksPlaceholder}/>
                                 <label className="label"><span className="label-text-alt">{t.commaSeparated}</span></label>
                             </div>
                         </div>

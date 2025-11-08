@@ -3,7 +3,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getTranslations, type Translations } from "@/app/lib/i18n";
+import { getTranslations } from "@/app/lib/i18n";
 
 
 export default function LoginPage() {
@@ -13,7 +13,7 @@ export default function LoginPage() {
   const { status } = useSession();
 
   // Initialize state to null until the language is detected.
-  const [t, setT] = useState<Translations['authPages'] | null>(null);
+  const [t, setT] = useState<any>(null);
 
   // Detect browser language on component mount
   useEffect(() => {
