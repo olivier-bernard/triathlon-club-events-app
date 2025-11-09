@@ -12,7 +12,7 @@ type Message = {
   createdAt: Date;
   isPrivate: boolean;
   user: {
-    id: number;
+    id: string;
     displayName: string | null;
   };
 };
@@ -30,7 +30,7 @@ type ChatTranslations = {
 
 interface EventChatProps {
   eventId: string;
-  currentUserId?: number;
+  currentUserId?: string;
   initialMessages: Message[];
   translations: ChatTranslations;
 }
@@ -74,8 +74,9 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
 }
 
 // Single Message Component
-function ChatMessage({ message, currentUserId, translations }: { message: Message; currentUserId?: number; translations: ChatTranslations }) {
+function ChatMessage({ message, currentUserId, translations }: { message: Message; currentUserId?: string; translations: ChatTranslations }) {
   const isCurrentUser = message.user.id === currentUserId;
+  console.log('message User ID:', message.user.id, 'Current User ID:', currentUserId);  
   const chatAlignment = isCurrentUser ? "chat-end" : "chat-start";
   const bubbleColor = isCurrentUser ? "chat-bubble-primary" : "chat-bubble bg-base-300";
 

@@ -3,7 +3,7 @@
 import { db } from "@/app/lib/db";
 
 // Function to get messages for an event
-export async function getMessagesByEventId(eventId: string, userId?: number) {
+export async function getMessagesByEventId(eventId: string, userId?: string) {
   if (!userId) {
     // If user is not logged in, only show public messages
     return db.message.findMany({
