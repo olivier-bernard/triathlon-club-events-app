@@ -1,6 +1,7 @@
 import LoginForm from "./LoginForm";
 import { getTranslations } from "@/app/lib/i18n";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
+
 
 const allTranslations = {
   fr: getTranslations("fr"),
