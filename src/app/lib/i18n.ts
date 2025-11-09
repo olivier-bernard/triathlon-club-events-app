@@ -1,4 +1,3 @@
-
 type Translations = {
   activityTranslations: Record<string, string>;
   eventTypeTranslations: Record<string, string>;
@@ -117,6 +116,7 @@ type Translations = {
     confirmNewPassword: string;
     updatePasswordButton: string;
     returnToLogin: string;
+    languageLabel: string; // Added language label
   };
   eventsContainer: {
     listView: string;
@@ -263,6 +263,7 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       updatePasswordButton: "Update Password",
       returnToLogin: "Return to login",
+      languageLabel: "English", // Added language label
     },
     eventsContainer: {
       listView: "List View",
@@ -407,6 +408,7 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       updatePasswordButton: "Mettre à jour",
       returnToLogin: "Retour à la connexion",
+      languageLabel: "Français", // Added language label
     },
     eventsContainer: {
       listView: "Liste",
