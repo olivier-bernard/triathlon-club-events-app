@@ -6,10 +6,11 @@ import EventForm from "../EventForm";
 export default async function NewEventPage() {
   const session = await getServerSession(authOptions);
   const lang = session?.user?.language || 'fr';
+  const timeFormat = session?.user?.timeFormat ?? true;
 
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/"); // Or a dedicated unauthorized page
   }
 
-  return <EventForm lang={lang} />;
+  return <EventForm lang={lang} timeFormat={timeFormat} />; 
 }

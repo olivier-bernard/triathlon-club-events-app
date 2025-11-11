@@ -9,9 +9,10 @@ import { getTranslations } from "@/app/lib/i18n";
 type EventFormProps = {
     event?: Event | null;
     lang: string;
+    timeFormat: boolean; // <-- Add this prop
 };
 
-export default function EventForm({ event, lang }: EventFormProps) {
+export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
     const translations = getTranslations(lang);
     const t = translations.eventForm;
 
@@ -27,7 +28,13 @@ export default function EventForm({ event, lang }: EventFormProps) {
 
     // For editing, format date and time for input fields
     const defaultDate = event?.date ? new Date(event.date).toISOString().split('T')[0] : "";
-    const defaultTime = event?.time ? new Date(new Date(event.time).getTime() - new Date().getTimezoneOffset() * 60000).toTimeString().substring(0, 5) : "";
+    const defaultTime = event?.time
+        ? new Date(event.time).toLocaleTimeString(lang, {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: !timeFormat,
+        }).padStart(5, '0') // ensures HH:MM format
+        : "";
 
     return (
         <div className="p-4 md:p-8">

@@ -17,6 +17,7 @@ export default async function EditEventPage(props: EditEventPageProps) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
   const lang = session?.user?.language || 'fr';
+  const timeFormat = session?.user?.timeFormat ?? true;
 
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/");
@@ -32,5 +33,5 @@ export default async function EditEventPage(props: EditEventPageProps) {
     notFound();
   }
 
-  return <EventForm event={event} lang={lang} />;
+  return <EventForm event={event} lang={lang} timeFormat={timeFormat} />;
 }
