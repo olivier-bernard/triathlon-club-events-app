@@ -9,7 +9,7 @@ import EventCard from "./EventCard";
 import { getTranslations } from "../lib/i18n"; // Import translations
 
 // Update props to accept lang
-export default function EventCalendar({ events, isAdmin, lang }: { events: Event[], isAdmin: boolean, lang: string }) {
+export default function EventCalendar({ events, isAdmin, lang, timeFormat }: { events: Event[], isAdmin: boolean, lang: string, timeFormat: boolean }) {
   const [activeDate, setActiveDate] = useState(new Date());
   const { calendar } = getTranslations(lang); 
 
@@ -92,18 +92,15 @@ export default function EventCalendar({ events, isAdmin, lang }: { events: Event
       {/* The Weekly Events List */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">
-          {/* Use translation for "Week of" */}
           {calendar.weekOf} {startOfWeek.toLocaleDateString(lang, { day: 'numeric', month: 'long' })}
         </h2>
         {weeklyEvents.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
             {weeklyEvents.map(event => (
-              // Pass the lang prop down to EventCard
-              <EventCard key={event.id} event={event} isAdmin={isAdmin} lang={lang} />
+              <EventCard key={event.id} event={event} isAdmin={isAdmin} lang={lang} timeFormat={timeFormat} />
             ))}
           </div>
         ) : (
-          // Use translation for "No events"
           <p className="text-base-content/70">{calendar.noEventsThisWeek}</p>
         )}
       </div>

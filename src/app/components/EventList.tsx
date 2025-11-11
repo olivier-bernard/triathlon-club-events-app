@@ -5,14 +5,15 @@ import type { Event } from "@/app/lib/types";
 type EventListProps = {
   events: Event[];
   isAdmin: boolean;
-  lang: string; // Receive lang from EventsContainer
+  lang: string;
+  timeFormat: boolean;
 };
 
-export default function EventList({ events, isAdmin, lang }: EventListProps) {
+export default function EventList({ events, isAdmin, lang, timeFormat }: EventListProps) {
   return (
     <div className="space-y-4">
       {events.map((event) => (
-        <EventCard key={event.id} event={event} isAdmin={isAdmin} lang={lang} /> // Pass lang to EventCard
+        <EventCard key={event.id} event={event} isAdmin={isAdmin} lang={lang} timeFormat={timeFormat} />
       ))}
     </div>
   );

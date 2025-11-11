@@ -15,6 +15,7 @@ export default async function EventsPage(props: EventsPageProps) {
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const userPrefersCalendar = session?.user?.calendarView ?? false;
   const lang = session?.user?.language || 'fr';
+  const timeFormat = session?.user?.timeFormat ?? true;
 
   const filters = {
     showPast: searchParams['showPast'] === 'true',
@@ -40,6 +41,7 @@ export default async function EventsPage(props: EventsPageProps) {
         isAdmin={isAdmin}
         initialView={userPrefersCalendar ? 'calendar' : 'list'}
         lang={lang}
+        timeFormat={timeFormat} // <-- Add this prop
       />
     </div>
   );

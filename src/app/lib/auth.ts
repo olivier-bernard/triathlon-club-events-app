@@ -109,7 +109,7 @@ export const authOptions: NextAuthOptions = {
             token.email = dbUser.email;
             token.calendarView = dbUser.calendarView;
             token.language = dbUser.language;
-            token.timeFormat = dbUser.timeFormat; // <-- Add this line
+            token.timeFormat = dbUser.timeFormat;
           }
         } catch (error) {
           console.error("Failed to update user session:", error);

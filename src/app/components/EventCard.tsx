@@ -21,24 +21,25 @@ const RoadIcon = () => (
 type EventCardProps = {
   event: Event;
   isAdmin: boolean;
-  lang: string; // Add lang prop
+  lang: string;
+  timeFormat: boolean;
 };
 
-const EventCard: React.FC<EventCardProps> = ({ event, isAdmin, lang }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, isAdmin, lang, timeFormat }) => {
   // Get the translation maps for the current language
   const { activityTranslations, eventTypeTranslations } = getTranslations(lang);
 
-  const dateStr = new Date(event.date).toLocaleDateString("fr-FR", {
+  const dateStr = new Date(event.date).toLocaleDateString(lang, {
     year: '2-digit',
     month: '2-digit',
     day: '2-digit',
     timeZone: "UTC", 
   });
 
-  const timeStr = event.time ? new Date(event.time).toLocaleTimeString("fr-FR", {
+  const timeStr = event.time ? new Date(event.time).toLocaleTimeString(lang, {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false,
+    hour12: !timeFormat, // <-- Use timeFormat here
     timeZone: "UTC", 
   }) : '';
 

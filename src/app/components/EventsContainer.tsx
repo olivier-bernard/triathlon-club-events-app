@@ -14,9 +14,10 @@ type EventsContainerProps = {
   isAdmin: boolean;
   initialView: 'list' | 'calendar';
   lang: string;
+  timeFormat: boolean; // <-- Add this prop
 };
 
-export default function EventsContainer({ initialEvents, isAdmin, initialView, lang }: EventsContainerProps) {
+export default function EventsContainer({ initialEvents, isAdmin, initialView, lang, timeFormat }: EventsContainerProps) {
   const [currentView, setView] = useState(initialView);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [events, setEvents] = useState(initialEvents);
@@ -65,9 +66,9 @@ export default function EventsContainer({ initialEvents, isAdmin, initialView, l
       <div className={isFilterOpen ? "mt-4" : ""}>
         {currentView === 'list' ? (
           // Ensure the 'lang' prop is passed to EventList
-          <EventList events={events} isAdmin={isAdmin} lang={lang} />
+          <EventList events={events} isAdmin={isAdmin} lang={lang} timeFormat={timeFormat} />
         ) : (
-          <EventCalendar events={events} isAdmin={isAdmin} lang={lang} />
+          <EventCalendar events={events} isAdmin={isAdmin} lang={lang} timeFormat={timeFormat} />
         )}
       </div>
     </div>
