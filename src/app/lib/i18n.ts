@@ -81,6 +81,9 @@ type Translations = {
     confirmNewPassword: string;
     passwordsDoNotMatch: string;
     updatePassword: string;
+    timeFormat: string;
+    timeFormat24h: string;
+    timeFormat12h: string;
   };
   navBar: {
     admin: string;
@@ -228,6 +231,9 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       passwordsDoNotMatch: "Passwords do not match.",
       updatePassword: "Update Password",
+      timeFormat: "Time Format",
+      timeFormat24h: "24 hours",
+      timeFormat12h: "12 hours (AM/PM)",
     },
     navBar: {
       admin: "Admin",
@@ -373,6 +379,9 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       passwordsDoNotMatch: "Les mots de passe ne correspondent pas.",
       updatePassword: "Mettre à jour le mot de passe",
+      timeFormat: "Format de l'heure",
+      timeFormat24h: "24 heures",
+      timeFormat12h: "12 heures (AM/PM)",
     },
     navBar: {
       admin: "Admin",

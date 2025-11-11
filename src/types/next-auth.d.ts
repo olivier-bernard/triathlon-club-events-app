@@ -11,6 +11,7 @@ declare module "next-auth" {
       roles: string[];
       language?: string;
       calendarView?: boolean;
+      timeFormat?: boolean;
       displayName?: string | null; 
     } & PrismaUser & // Combines Prisma User fields
       DefaultSession["user"]; // Adds default fields like name, email, image
@@ -20,6 +21,7 @@ declare module "next-auth" {
     roles: string[];
     calendarView?: boolean;
     language?: string;
+    timeFormat?: boolean;
     displayName?: string | null; 
   }
 }

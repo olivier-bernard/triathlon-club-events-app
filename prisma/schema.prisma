@@ -74,6 +74,7 @@ model User {
   emailVerified       DateTime?
   image               String?
   language            String               @default("fr")
+  timeFormat          Boolean              @default(true) // true = 24h, false = 12h
   accounts            Account[]
   Message             Message[]
   passwordResetTokens PasswordResetToken[]

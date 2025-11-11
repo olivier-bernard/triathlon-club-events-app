@@ -13,6 +13,7 @@ export async function updateProfileInfo(prevState: any, formData: FormData) {
   const displayName = formData.get("displayName") as string;
   const email = formData.get("email") as string;
   const language = formData.get("language") as string; // Read the language from the form
+  const timeFormat = formData.get("timeFormat") === "24"; // Read the time format from the form
 
   try {
     await db.user.update({
@@ -20,7 +21,8 @@ export async function updateProfileInfo(prevState: any, formData: FormData) {
       data: {
         displayName,
         email,
-        language, // Add language to the data being updated
+        language, 
+        timeFormat 
       },
     });
 

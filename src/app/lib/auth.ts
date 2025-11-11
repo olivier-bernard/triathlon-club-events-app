@@ -76,6 +76,7 @@ export const authOptions: NextAuthOptions = {
         token.roles = user.roles;
         token.calendarView = user.calendarView;
         token.language = user.language;
+        token.timeFormat = user.timeFormat; // <-- Add this line
       }
 
       // Handle session updates (e.g., from useSession().update())
@@ -108,6 +109,7 @@ export const authOptions: NextAuthOptions = {
             token.email = dbUser.email;
             token.calendarView = dbUser.calendarView;
             token.language = dbUser.language;
+            token.timeFormat = dbUser.timeFormat; // <-- Add this line
           }
         } catch (error) {
           console.error("Failed to update user session:", error);
@@ -119,12 +121,13 @@ export const authOptions: NextAuthOptions = {
     
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string; // Ensure id is a string
+        session.user.id = token.id as string;
         session.user.name = token.name;
         session.user.email = token.email ?? null;
         session.user.roles = token.roles as string[];
         session.user.calendarView = token.calendarView as boolean;
         session.user.language = token.language as string;
+        session.user.timeFormat = token.timeFormat as boolean;
       }
       return session;
     },

@@ -22,6 +22,9 @@ export function ProfileInfoForm({ user, lang }: { user: User; lang: string }) {
   const { profilePage } = getTranslations(lang);
   const [state, formAction] = useActionState(updateProfileInfo, null);
   const [selectedLanguage, setSelectedLanguage] = useState(user.language || 'fr');
+  const [selectedTimeFormat, setSelectedTimeFormat] = useState(
+    typeof user.timeFormat === "boolean" ? user.timeFormat : true
+  );
   const router = useRouter();
   const { update } = useSession();
 
@@ -32,15 +35,15 @@ export function ProfileInfoForm({ user, lang }: { user: User; lang: string }) {
   }, [user.language]);
 
   useEffect(() => {
-    // Define an async function to handle the update process
+    if (typeof user.timeFormat === "boolean") {
+      setSelectedTimeFormat(user.timeFormat);
+    }
+  }, [user.timeFormat]);
+
+  useEffect(() => {
     const handleSuccess = async () => {
       if (state?.success) {
-        // 1. First, AWAIT the session update. This ensures the session token
-        //    on the server is fresh before we do anything else.
         await update({ language: selectedLanguage });
-
-        // 2. THEN, refresh the page. Now when the server re-fetches data,
-        //    getServerSession() will receive the new, correct token.
         router.refresh();
       }
     };
@@ -77,6 +80,18 @@ export function ProfileInfoForm({ user, lang }: { user: User; lang: string }) {
             >
               <option value="fr">Français</option>
               <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label className="label"><span className="label-text">{profilePage.timeFormat}</span></label>
+            <select
+              name="timeFormat"
+              className="select select-bordered w-full"
+              value={selectedTimeFormat ? "24" : "12"}
+              onChange={e => setSelectedTimeFormat(e.target.value === "24")}
+            >
+              <option value="24">{profilePage.timeFormat24h}</option>
+              <option value="12">{profilePage.timeFormat12h}</option>
             </select>
           </div>
           <div className="card-actions justify-end">

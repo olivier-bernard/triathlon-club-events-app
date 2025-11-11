@@ -34,6 +34,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
+  const timeFormat = session?.user?.timeFormat ?? true;
   const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 
   if (!event) {
@@ -58,6 +59,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
     if (event.type === 'TRAINING') return 'border-green-500';
     return 'border-transparent';
   };
+
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -93,7 +95,13 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
               <div className="space-y-3 text-base md:text-lg mt-4">
                 <p className="flex items-center"><CalendarDaysIcon className="h-6 w-6 mr-3 text-primary" /> {new Date(event.date).toLocaleDateString(lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time ? new Date(event.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : 'N/A'}</p>
+                <p className="flex items-center"><ClockIcon className="h-6 w-6 mr-3 text-primary" /> {event.time
+                  ? new Date(event.time).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: !timeFormat, // 24h if true, 12h if false
+                  })
+                  : 'N/A'}</p>
                 <p className="flex items-center"><MapPinIcon className="h-6 w-6 mr-3 text-primary" /> {event.location}</p>
                 <p className="flex items-center"><FlagIcon className="h-6 w-6 mr-3 text-primary" /> {eventDetail.distances}: {event.distanceOptions.join(" / ")}</p>
                 <p className="flex items-center"><UsersIcon className="h-6 w-6 mr-3 text-primary" /> {eventDetail.attendees}: {event.attendees}{event.attendeesLimit > 0 && ` / ${event.attendeesLimit}`}</p>
@@ -178,8 +186,9 @@ export default async function EventDetail(props: EventDetailPageProps) {
               <EventChat
                 eventId={event.id}
                 currentUserId={userId}
-                initialMessages={JSON.parse(JSON.stringify(messages))} // Serialize date objects
+                initialMessages={JSON.parse(JSON.stringify(messages))}
                 translations={chatTranslations}
+                timeFormat={timeFormat}
               />
             </div>
           )}

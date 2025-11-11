@@ -33,10 +33,11 @@ interface EventChatProps {
   currentUserId?: string;
   initialMessages: Message[];
   translations: ChatTranslations;
+  timeFormat: boolean; // <-- Add this prop
 }
 
 // Main Chat Component
-export default function EventChat({ eventId, currentUserId, initialMessages, translations }: EventChatProps) {
+export default function EventChat({ eventId, currentUserId, initialMessages, translations, timeFormat }: EventChatProps) {
   const hasMessages = initialMessages.length > 0;
   const messagesContainerRef = useRef<HTMLDivElement>(null); // Create a ref for the messages container
 
@@ -60,7 +61,13 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
           {hasMessages && (
             <div ref={messagesContainerRef} className="space-y-2 mb-2 max-h-72 overflow-y-auto p-2 bg-base-100 rounded-box"> {/* Attach the ref */}
               {initialMessages.map((msg) => (
-                <ChatMessage key={msg.id} message={msg} currentUserId={currentUserId} translations={translations} />
+                <ChatMessage
+                  key={msg.id}
+                  message={msg}
+                  currentUserId={currentUserId}
+                  translations={translations}
+                  timeFormat={timeFormat} // <-- Pass here
+                />
               ))}
             </div>
           )}
@@ -74,9 +81,8 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
 }
 
 // Single Message Component
-function ChatMessage({ message, currentUserId, translations }: { message: Message; currentUserId?: string; translations: ChatTranslations }) {
+function ChatMessage({ message, currentUserId, translations, timeFormat }: { message: Message; currentUserId?: string; translations: ChatTranslations; timeFormat: boolean }) {
   const isCurrentUser = message.user.id === currentUserId;
-  console.log('message User ID:', message.user.id, 'Current User ID:', currentUserId);  
   const chatAlignment = isCurrentUser ? "chat-end" : "chat-start";
   const bubbleColor = isCurrentUser ? "chat-bubble-primary" : "chat-bubble bg-base-300";
 
@@ -84,7 +90,7 @@ function ChatMessage({ message, currentUserId, translations }: { message: Messag
     <div className={`chat ${chatAlignment}`}>
       <div className="chat-header flex items-center gap-2 pb-1">
         {message.user.displayName}
-        <ChatLocalTime date={message.createdAt.toString()} /> {/* Use client component for local time */}
+        <ChatLocalTime date={message.createdAt.toString()} timeFormat={timeFormat} /> 
         {message.isPrivate && <LockClosedIcon className="h-3 w-3 text-warning" title={translations.privateIndicator} />}
       </div>
       <div className={`chat-bubble ${bubbleColor} whitespace-pre-line`}>{message.content}</div>
