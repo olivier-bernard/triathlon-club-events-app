@@ -58,6 +58,7 @@ type Translations = {
     linksPlaceholder: string;
     updateButton: string;
     createButton: string;
+    addDistance: string;
   };
   adminUsers: {
     title: string;
@@ -119,7 +120,7 @@ type Translations = {
     confirmNewPassword: string;
     updatePasswordButton: string;
     returnToLogin: string;
-    languageLabel: string; // Added language label
+    languageLabel: string;
   };
   eventsContainer: {
     listView: string;
@@ -208,6 +209,7 @@ export const translations: Record<string, Translations> = {
       linksPlaceholder: "e.g., https://..., https://...",
       updateButton: "Update Event",
       createButton: "Create Event",
+      addDistance: "Ajouter un parcours",
     },
     adminUsers: {
       title: "User Management",
@@ -269,7 +271,7 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirm New Password",
       updatePasswordButton: "Update Password",
       returnToLogin: "Return to login",
-      languageLabel: "English", // Added language label
+      languageLabel: "English",
     },
     eventsContainer: {
       listView: "List View",
@@ -356,6 +358,7 @@ export const translations: Record<string, Translations> = {
       linksPlaceholder: "ex: https://..., https://...",
       updateButton: "Mettre à jour",
       createButton: "Créer l'événement",
+      addDistance: "Ajouter un parcours",
     },
     adminUsers: {
       title: "Gestion des utilisateurs",
@@ -417,7 +420,7 @@ export const translations: Record<string, Translations> = {
       confirmNewPassword: "Confirmer le nouveau mot de passe",
       updatePasswordButton: "Mettre à jour",
       returnToLogin: "Retour à la connexion",
-      languageLabel: "Français", // Added language label
+      languageLabel: "Français",
     },
     eventsContainer: {
       listView: "Liste",
@@ -436,5 +439,5 @@ export const translations: Record<string, Translations> = {
 };
 
 export const getTranslations = (lang: string): Translations => {
-  return translations[lang] || translations.en; // Default to English
+  return translations[lang] || translations.en;
 };

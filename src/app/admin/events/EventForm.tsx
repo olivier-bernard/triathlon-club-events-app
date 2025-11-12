@@ -6,6 +6,12 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { getTranslations } from "@/app/lib/i18n";
 
+// --- New Type for Track State ---
+type Track = {
+    distance: string;
+    link: string;
+};
+
 type EventFormProps = {
     event?: Event | null;
     lang: string;
@@ -25,6 +31,31 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
     const eventTypeKeys = Object.keys(translations.eventTypeTranslations);
 
     const [eventType, setEventType] = useState(event?.type || eventTypeKeys[0]);
+
+    // --- New State for Dynamic Tracks ---
+    const initialTracks = event?.distanceOptions?.map((distance, index) => ({
+        distance: distance,
+        link: event.eventLinks?.[index] || "",
+    })) || [{ distance: "", link: "" }]; // Start with one empty track for new events
+
+    const [tracks, setTracks] = useState<Track[]>(initialTracks);
+
+    const handleTrackChange = (index: number, field: keyof Track, value: string) => {
+        const newTracks = [...tracks];
+        newTracks[index][field] = value;
+        setTracks(newTracks);
+    };
+
+    const addTrack = () => {
+        setTracks([...tracks, { distance: "", link: "" }]);
+    };
+
+    const removeTrack = (index: number) => {
+        if (tracks.length <= 1) return; // Don't remove the last track
+        const newTracks = tracks.filter((_, i) => i !== index);
+        setTracks(newTracks);
+    };
+    // --- End of New State Logic ---
 
     // --- Start of Recommended Changes ---
 
@@ -170,20 +201,51 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
                 <div className="card bg-base-200 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title mb-4">{t.linksAndDistances}</h2>
-                        <div className="space-y-6">
-                            {/* Distance Options */}
-                            <div className="form-control">
-                                <label htmlFor="distanceOptions" className="label"><span className="label-text">{t.distanceOptions}</span></label>
-                                <input type="text" id="distanceOptions" name="distanceOptions" className="input input-bordered w-full" defaultValue={event?.distanceOptions?.join(", ") || ""} placeholder={t.distancePlaceholder} />
-                                <label className="label"><span className="label-text-alt">{t.commaSeparated}</span></label>
-                            </div>
+                        
+                        {/* --- Hidden inputs for form submission --- */}
+                        <input type="hidden" name="distanceOptions" value={tracks.map(t => t.distance).join(",")} />
+                        <input type="hidden" name="eventLinks" value={tracks.map(t => t.link).join(",")} />
 
-                            {/* Event Links */}
-                            <div className="form-control">
-                                <label htmlFor="eventLinks" className="label"><span className="label-text">{t.eventLinks}</span></label>
-                                <input type="text" id="eventLinks" name="eventLinks" className="input input-bordered w-full" defaultValue={event?.eventLinks?.join(", ") || ""} placeholder={t.linksPlaceholder}/>
-                                <label className="label"><span className="label-text-alt">{t.commaSeparated}</span></label>
-                            </div>
+                        <div className="space-y-4">
+                            <label className="label"><span className="label-text font-medium">{t.distanceOptions}</span></label>
+                            {tracks.map((track, index) => (
+                                <div key={index} className="p-4 border border-base-300 rounded-lg space-y-2 relative bg-base-100">
+                                    {tracks.length > 1 && (
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeTrack(index)} 
+                                            className="btn btn-xs btn-circle btn-ghost absolute top-2 right-2"
+                                            aria-label="Remove track"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                    <div className="form-control">
+                                        <label className="label py-1"><span className="label-text-alt">{t.distancePlaceholder || 'Track Name or Distance'}</span></label>
+                                        <input 
+                                            type="text" 
+                                            value={track.distance}
+                                            onChange={(e) => handleTrackChange(index, 'distance', e.target.value)}
+                                            className="input input-bordered w-full" 
+                                            placeholder="e.g., Parcours S, 10km Run"
+                                            required 
+                                        />
+                                    </div>
+                                    <div className="form-control">
+                                        <label className="label py-1"><span className="label-text-alt">{t.linksPlaceholder || 'Link (GPX, website)'}</span></label>
+                                        <input 
+                                            type="url" 
+                                            value={track.link}
+                                            onChange={(e) => handleTrackChange(index, 'link', e.target.value)}
+                                            className="input input-bordered w-full" 
+                                            placeholder="https://..."
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                            <button type="button" onClick={addTrack} className="btn btn-sm bg-green-50 hover:bg-green-100 shadow-md border-green-200 text-green-900">
+                                {t.addDistance || 'Add Track'}
+                            </button>
                         </div>
                     </div>
                 </div>
