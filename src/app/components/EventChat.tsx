@@ -1,9 +1,9 @@
 'use client'; // Component now uses client-side hooks
 
-import { createMessage } from "@/app/lib/actions/messages";
+import { createMessage, getNewerMessages } from "@/app/lib/actions/messages";
 import { PaperAirplaneIcon, LockClosedIcon } from "@heroicons/react/24/outline";
-import { useRef, useTransition, useEffect } from "react"; // Import useEffect
-import ChatLocalTime from "./ChatLocalTime"; // Add this import
+import { useRef, useTransition, useEffect, useState } from "react"; // Import useState
+import ChatLocalTime from "./ChatLocalTime";
 
 // Define the type for a message based on what getMessagesByEventId returns
 type Message = {
@@ -33,21 +33,56 @@ interface EventChatProps {
   currentUserId?: string;
   initialMessages: Message[];
   translations: ChatTranslations;
-  timeFormat: boolean; // <-- Add this prop
+  timeFormat: boolean; 
 }
 
 // Main Chat Component
 export default function EventChat({ eventId, currentUserId, initialMessages, translations, timeFormat }: EventChatProps) {
-  const hasMessages = initialMessages.length > 0;
-  const messagesContainerRef = useRef<HTMLDivElement>(null); // Create a ref for the messages container
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const hasMessages = messages.length > 0;
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // useEffect hook to scroll to the bottom on initial render
+  // Scroll to bottom when new messages are added
   useEffect(() => {
     if (messagesContainerRef.current) {
       const { scrollHeight } = messagesContainerRef.current;
       messagesContainerRef.current.scrollTop = scrollHeight;
     }
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, [messages]);
+
+  // Effect to track page visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => setIsPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    // Set initial state in case tab is opened in the background
+    handleVisibilityChange();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // Polling for new messages, now aware of page visibility
+  useEffect(() => {
+    // Only poll if there are messages AND the page is visible to the user.
+    if (messages.length === 0 || !isPageVisible) {
+      return; 
+    }
+
+    const pollInterval = setInterval(async () => {
+      const lastMessage = messages[messages.length - 1];
+      const newMessages = await getNewerMessages(eventId, lastMessage.createdAt.toString(), currentUserId);
+      if (newMessages.length > 0) {
+        setMessages(prevMessages => [...prevMessages, ...newMessages]);
+      }
+    }, 60000); 
+
+    // Cleanup interval when component unmounts or dependencies change (e.g., page becomes hidden)
+    return () => clearInterval(pollInterval);
+  }, [messages, eventId, currentUserId, isPageVisible]); // Add isPageVisible to dependencies
+
 
   return (
     <div className={`collapse collapse-arrow bg-base-200 shadow-xl ${hasMessages ? 'collapse-open' : ''}`}>
@@ -59,21 +94,26 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
         <div className="card-body !p-2"> 
           {/* Message Display Area */}
           {hasMessages && (
-            <div ref={messagesContainerRef} className="space-y-2 mb-2 max-h-72 overflow-y-auto p-2 bg-base-100 rounded-box"> {/* Attach the ref */}
-              {initialMessages.map((msg) => (
+            <div ref={messagesContainerRef} className="space-y-2 mb-2 max-h-72 overflow-y-auto p-2 bg-base-100 rounded-box">
+              {messages.map((msg) => (
                 <ChatMessage
                   key={msg.id}
                   message={msg}
                   currentUserId={currentUserId}
                   translations={translations}
-                  timeFormat={timeFormat} // <-- Pass here
+                  timeFormat={timeFormat}
                 />
               ))}
             </div>
           )}
           
           {/* Message Input Form */}
-          <ChatInput eventId={eventId} translations={translations} />
+          <ChatInput 
+            eventId={eventId} 
+            translations={translations}
+            onMessageSent={(newMsg) => setMessages(prev => [...prev, newMsg])}
+            currentUserId={currentUserId}
+          />
         </div>
       </div>
     </div>
@@ -99,26 +139,31 @@ function ChatMessage({ message, currentUserId, translations, timeFormat }: { mes
 }
 
 // Input Form Component - Now a Client Component
-function ChatInput({ eventId, translations }: { eventId: string; translations: ChatTranslations }) {
+function ChatInput({ eventId, translations, onMessageSent, currentUserId }: { eventId: string; translations: ChatTranslations; onMessageSent: (msg: Message) => void; currentUserId?: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
 
+  const handleFormSubmit = (formData: FormData) => {
+    // Don't send if content is just whitespace
+    if (!formData.get('content')?.toString().trim()) {
+        return;
+    }
+
+    startTransition(async () => {
+        const newMsg = await createMessage(formData);
+        if (newMsg) {
+            onMessageSent(newMsg); // Add the new message to the chat
+        }
+        formRef.current?.reset();
+    });
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Submit on Enter, but allow new line with Shift+Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (formRef.current) {
-        // Create a FormData object from the form
         const formData = new FormData(formRef.current);
-        // Check if content is not just whitespace
-        if (formData.get('content')?.toString().trim()) {
-            startTransition(() => {
-                // Programmatically call the server action
-                createMessage(formData);
-                // Reset the form after submission
-                formRef.current?.reset();
-            });
-        }
+        handleFormSubmit(formData);
       }
     }
   };
@@ -126,12 +171,7 @@ function ChatInput({ eventId, translations }: { eventId: string; translations: C
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    if (formData.get('content')?.toString().trim()) {
-        startTransition(() => {
-            createMessage(formData);
-            formRef.current?.reset();
-        });
-    }
+    handleFormSubmit(formData);
   };
 
   return (

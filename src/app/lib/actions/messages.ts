@@ -4,11 +4,10 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/app/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth"; // Corrected import path
+import { getMessagesByEventIdAfter } from "../queries/messages";
 
-// Action to create a new message
 export async function createMessage(formData: FormData) {
   const session = await getServerSession(authOptions);
-  // The user ID from the session can be a string or number depending on the adapter
   const userId = session?.user?.id ? String(session.user.id) : null;
 
   if (!userId) {
@@ -23,14 +22,28 @@ export async function createMessage(formData: FormData) {
     throw new Error("Message content and event ID are required.");
   }
 
-  await db.message.create({
+  const newMessage = await db.message.create({
     data: {
       content,
       isPrivate,
       eventId,
       userId: userId,
     },
+    include: {
+      user: {
+        select: { id: true, displayName: true },
+      },
+    },
   });
 
   revalidatePath(`/events/${eventId}`);
+  return JSON.parse(JSON.stringify(newMessage)); // Ensure it's serializable for client
+}
+
+export async function getNewerMessages(eventId: string, lastMessageDate: string, currentUserId?: string) {
+  "use server";
+  // We use a dedicated query that is safe to expose and call from the client frequently.
+  const messages = await getMessagesByEventIdAfter(eventId, new Date(lastMessageDate), currentUserId);
+  // We need to serialize the data to pass it from a server component to a client component.
+  return JSON.parse(JSON.stringify(messages));
 }
