@@ -8,6 +8,8 @@ export default async function NewEventPage() {
   const lang = session?.user?.language || 'fr';
   const timeFormat = session?.user?.timeFormat ?? true;
 
+  console.log("NewEventPage timeFormat:", timeFormat);
+
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/"); // Or a dedicated unauthorized page
   }

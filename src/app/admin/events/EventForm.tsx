@@ -26,15 +26,39 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
 
     const [eventType, setEventType] = useState(event?.type || eventTypeKeys[0]);
 
-    // For editing, format date and time for input fields
-    const defaultDate = event?.date ? new Date(event.date).toISOString().split('T')[0] : "";
-    const defaultTime = event?.time
-        ? new Date(event.time).toLocaleTimeString(lang, {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: !timeFormat,
-        }).padStart(5, '0') // ensures HH:MM format
-        : "";
+    // --- Start of Recommended Changes ---
+
+    // Treat the ISO string from the database as text to avoid timezone conversion.
+    // Example: "2025-11-20T14:00:00.000Z"
+    const dateIsoString = event?.date ? new Date(event.date).toISOString() : "";
+    console.log("EventForm isoString:", dateIsoString);
+
+    // Extract 'YYYY-MM-DD' directly from the ISO string.
+    const defaultDate = dateIsoString ? dateIsoString.substring(0, 10) : "";
+    
+    // Extract 'HH:mm' directly from the date string.
+    const timeIsoString = event?.time ? new Date(event.time).toISOString() : "";
+    console.log("EventForm isoString:", timeIsoString);
+    const time24h = timeIsoString ? timeIsoString.substring(11, 16) : "";
+    console.log("EventForm time24h:", time24h);
+
+    // --- End of Recommended Changes ---
+
+    let defaultTimeValue = time24h;
+    console.log("EventForm defaultTimeValue:", defaultTimeValue);
+    let defaultAmPm = 'AM';
+
+    // If timeFormat is 12-hour AND there is a time, convert it
+    if (!timeFormat && time24h) {
+        let [hours, minutes] = time24h.split(':').map(Number);
+        defaultAmPm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert hour to 12-hour format (12, 1, 2, ..., 11)
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        defaultTimeValue = `${formattedHours}:${formattedMinutes}`;
+    }
+    console.log("EventForm defaultTimeValue:", defaultTimeValue);
+    // --- End Time Formatting Logic ---
 
     return (
         <div className="p-4 md:p-8">
@@ -93,7 +117,25 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
                             {/* Time */}
                             <div className="form-control">
                                 <label htmlFor="time" className="label"><span className="label-text">{t.time}</span></label>
-                                <input type="time" id="time" name="time" className="input input-bordered w-full" defaultValue={defaultTime} pattern="[0-2][0-9]:[0-5][0-9]" placeholder="HH:MM" required={eventType !== "COMPETITION"} />
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="text" 
+                                        id="time" 
+                                        name="time" 
+                                        className="input input-bordered w-full" 
+                                        defaultValue={defaultTimeValue} 
+                                        pattern={timeFormat ? "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$" : "^(0?[1-9]|1[0-2]):[0-5][0-9]$"}
+                                        placeholder={timeFormat ? "HH:MM" : "hh:mm"}
+                                        required={eventType !== "COMPETITION"} 
+                                        maxLength={5}
+                                    />
+                                    {!timeFormat && (
+                                        <select name="ampm" className="select select-bordered" defaultValue={defaultAmPm}>
+                                            <option>AM</option>
+                                            <option>PM</option>
+                                        </select>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Location */}

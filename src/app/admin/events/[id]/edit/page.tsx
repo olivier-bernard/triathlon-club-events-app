@@ -18,6 +18,7 @@ export default async function EditEventPage(props: EditEventPageProps) {
   const session = await getServerSession(authOptions);
   const lang = session?.user?.language || 'fr';
   const timeFormat = session?.user?.timeFormat ?? true;
+  console.log("EditEventPage timeFormat:", timeFormat);
 
   if (!session?.user?.roles?.includes("admin")) {
     redirect("/");
