@@ -77,7 +77,7 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
       if (newMessages.length > 0) {
         setMessages(prevMessages => [...prevMessages, ...newMessages]);
       }
-    }, 60000); 
+    }, 30000); 
 
     // Cleanup interval when component unmounts or dependencies change (e.g., page becomes hidden)
     return () => clearInterval(pollInterval);
