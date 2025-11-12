@@ -31,6 +31,7 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
     const eventTypeKeys = Object.keys(translations.eventTypeTranslations);
 
     const [eventType, setEventType] = useState(event?.type || eventTypeKeys[0]);
+    const [groupCount, setGroupCount] = useState(event?.groupList?.length || 0);
 
     // --- New State for Dynamic Tracks ---
     const initialTracks = event?.distanceOptions?.map((distance, index) => ({
@@ -192,6 +193,20 @@ export default function EventForm({ event, lang, timeFormat }: EventFormProps) {
                             <div className="form-control">
                                 <label htmlFor="attendeesLimit" className="label"><span className="label-text">{t.attendeesLimit}</span></label>
                                 <input type="number" id="attendeesLimit" name="attendeesLimit" className="input input-bordered w-full" defaultValue={event?.attendeesLimit ?? 0} min="0" required />
+                            </div>
+                             {/* Group Count */}
+                             <div className="form-control">
+                                <label htmlFor="groupCount" className="label"><span className="label-text">Number of Groups (0 for none)</span></label>
+                                <input 
+                                    type="number" 
+                                    id="groupCount" 
+                                    name="groupCount" 
+                                    className="input input-bordered w-full" 
+                                    value={groupCount}
+                                    onChange={(e) => setGroupCount(Number(e.target.value))}
+                                    min="0" 
+                                    required 
+                                />
                             </div>
                         </div>
                     </div>

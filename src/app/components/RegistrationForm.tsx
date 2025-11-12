@@ -8,6 +8,7 @@ import { getTranslations } from "@/app/lib/i18n";
 interface RegistrationFormProps {
   eventId: string;
   distanceOptions: string[];
+  groupList: string[];
   user: {
     id: string;
     displayName: string;
@@ -33,11 +34,11 @@ function SubmitButton({ lang }: { lang: string }) {
   );
 }
 
-export default function RegistrationForm({ eventId, distanceOptions, user, defaultToManual = false, lang = "fr" }: RegistrationFormProps) {
+export default function RegistrationForm({ eventId, distanceOptions, groupList, user, defaultToManual = false, lang = "fr" }: RegistrationFormProps) {
   const t = getTranslations(lang).eventRegistration;
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
-  const [groupLevel, setGroupLevel] = useState("1");
+  const [groupLevel, setGroupLevel] = useState(groupList?.[0] || "-");
   
   // If user is null, it's always a manual entry.
   const isForLoggedInUser = user && !defaultToManual;
@@ -48,6 +49,9 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
 
   async function action(formData: FormData) {
     formData.append("eventId", eventId);
+    if (groupList.length === 0) {
+      formData.append("groupLevel", "-");
+    }
 
     try {
       const result = await registerForEvent(formData);
@@ -111,20 +115,22 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
       </div>
 
       {/* Group Level Selection */}
-      <div className="form-control">
-        <label className="label"><span className="label-text">{t.groupLevelLabel}</span></label>
-        <select
-          name="groupLevel"
-          value={groupLevel}
-          onChange={(e) => setGroupLevel(e.target.value)}
-          className="select select-bordered"
-          required
-        >
-          {["1", "2", "3"].map((level) => (
-            <option key={level} value={level}>{level}</option>
-          ))}
-        </select>
-      </div>
+      {groupList && groupList.length > 0 && (
+        <div className="form-control">
+          <label className="label"><span className="label-text">{t.groupLevelLabel}</span></label>
+          <select
+            name="groupLevel"
+            value={groupLevel}
+            onChange={(e) => setGroupLevel(e.target.value)}
+            className="select select-bordered"
+            required
+          >
+            {groupList.map((level) => (
+              <option key={level} value={level}>{level}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <SubmitButton lang={lang} />
     </form>

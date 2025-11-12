@@ -14,6 +14,7 @@ export interface Event {
   attendeesList: string[];
   seance?: string | null;
   eventLinks?: string[];
+  groupList: string[];
 }
 
 const eventWithRegistrations = Prisma.validator<Prisma.EventDefaultArgs>()({

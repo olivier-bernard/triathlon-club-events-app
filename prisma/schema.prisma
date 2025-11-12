@@ -21,6 +21,7 @@ model Event {
   attendeesLimit  Int
   attendees       Int
   seance          String?
+  groupList       String[]
   Message         Message[]
   registrations   Registration[]
 }

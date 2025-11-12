@@ -21,6 +21,7 @@ const FormSchema = z.object({
     location: z.string(),
     attendeesLimit: z.coerce.number().int().min(0),
     seance: z.string().optional(),
+    groupCount: z.coerce.number().int().min(0),
 });
 
 const CreateEventSchema = FormSchema.omit({ id: true });
@@ -42,7 +43,7 @@ export async function createEvent(prevState: { message: string }, formData: Form
             return { message: "Invalid form data." };
         }
 
-        const { date, time, ...data } = validatedFields.data;
+        const { date, time, groupCount, ...data } = validatedFields.data;
         const eventDate = new Date(date);
         let eventTime: Date | null = null;
         if (time) {
@@ -51,12 +52,14 @@ export async function createEvent(prevState: { message: string }, formData: Form
             eventTime.setUTCHours(hours, minutes, 0, 0);
         }
 
+        const groupList = Array.from({ length: groupCount }, (_, i) => String(i + 1));
 
         await prisma.event.create({
             data: {
                 ...data,
                 date: eventDate,
                 time: eventTime,
+                groupList: groupList,
                 attendees: 0,
                 attendeesList: [],
             },
@@ -79,7 +82,7 @@ export async function updateEvent(prevState: { message: string }, formData: Form
             return { message: "Invalid form data." };
         }
 
-        const { id, date, time, ...data } = validatedFields.data;
+        const { id, date, time, groupCount, ...data } = validatedFields.data;
         if (!id) {
             return { message: "Event ID is missing." };
         }
@@ -91,12 +94,16 @@ export async function updateEvent(prevState: { message: string }, formData: Form
             eventTime = new Date(date);
             eventTime.setUTCHours(hours, minutes, 0, 0);
         }
+
+        const groupList = Array.from({ length: groupCount }, (_, i) => String(i + 1));
+
         await prisma.event.update({
             where: { id },
             data: {
                 ...data,
                 date: eventDate,
                 time: eventTime,
+                groupList: groupList,
             },
         });
     } catch (error) {

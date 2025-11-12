@@ -162,6 +162,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
+                    groupList={event.groupList}
                     user={null}
                     lang={lang}
                   />
@@ -174,6 +175,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
+                    groupList={event.groupList}
                     user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
                     lang={lang}
                   />
