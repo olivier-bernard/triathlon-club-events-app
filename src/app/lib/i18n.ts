@@ -140,6 +140,7 @@ type Translations = {
     manualEntry: string,
     parcoursLabel: string,
     groupLevelLabel: string,
+    registerButton: string,
   };
 };
 
@@ -297,6 +298,7 @@ export const translations: Record<string, Translations> = {
       manualEntry: "Enter another athlete manually",
       parcoursLabel: "Course",
       groupLevelLabel: "Group Level",
+      registerButton: "Register",
     }
   },
   fr: {
@@ -452,6 +454,7 @@ export const translations: Record<string, Translations> = {
       manualEntry: "Entrer manuellement un autre athlète",
       parcoursLabel: "Parcours",
       groupLevelLabel: "Groupe de niveau",
+      registerButton: "S'inscrire",
     }
   },
 };

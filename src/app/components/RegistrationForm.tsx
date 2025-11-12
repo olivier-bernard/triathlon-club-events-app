@@ -19,15 +19,16 @@ interface RegistrationFormProps {
 
 const MANUAL_ENTRY_KEY = "manual";
 
-function SubmitButton() {
+function SubmitButton({ lang }: { lang: string }) {
   const { pending } = useFormStatus();
+  const t = getTranslations(lang).eventRegistration;
   return (
     <button
       type="submit"
       className="btn btn-primary font-bold py-2 px-4 rounded-lg hover:bg-primary-focus"
       disabled={pending}
     >
-      {pending ? <span className="loading loading-spinner"></span> : "S'enregistrer"}
+      {pending ? <span className="loading loading-spinner"></span> : (t.registerButton || "Register")}
     </button>
   );
 }
@@ -37,14 +38,13 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
   const [groupLevel, setGroupLevel] = useState("1");
-  const [nameSelection, setNameSelection] = useState(() => {
-    if (defaultToManual) {
-      return MANUAL_ENTRY_KEY;
-    }
-    return user?.displayName || MANUAL_ENTRY_KEY;
-  });
+  
+  // If user is null, it's always a manual entry.
+  const isForLoggedInUser = user && !defaultToManual;
 
-  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY;
+  const [nameSelection, setNameSelection] = useState(isForLoggedInUser ? user.displayName : MANUAL_ENTRY_KEY);
+
+  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY || !isForLoggedInUser;
 
   async function action(formData: FormData) {
     formData.append("eventId", eventId);
@@ -66,12 +66,15 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
 
   return (
     <form action={action} className="flex flex-col gap-4">
+      {/* This hidden input is crucial. It ensures nameSelection is always submitted. */}
+      <input type="hidden" name="nameSelection" value={nameSelection} />
+
       {/* Name Input Section */}
       <div className="form-control">
         <label className="label"><span className="label-text">{t.nameLabel}</span></label>
-        {user ? (
+        {isForLoggedInUser ? (
           <select
-            name="nameSelection"
+            // The name attribute is removed here to avoid duplicate submission.
             className="select select-bordered"
             value={nameSelection}
             onChange={(e) => setNameSelection(e.target.value)}
@@ -123,7 +126,7 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
         </select>
       </div>
 
-      <SubmitButton />
+      <SubmitButton lang={lang} />
     </form>
   );
 };
