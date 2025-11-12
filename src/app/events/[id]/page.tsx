@@ -30,7 +30,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
   const event = await getEventById(id);
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ? String(session.user.id) : undefined;
-  const messages = await getMessagesByEventId(id, userId); // Fetch messages
+  const messages = await getMessagesByEventId(id, userId); 
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';

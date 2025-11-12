@@ -37,7 +37,7 @@ export async function registerForEvent(formData: FormData) {
       name: displayName,
       tour: tour,
       groupLevel: groupLevel,
-      userId: isManualEntry ? null : session?.user?.id,
+      userId: isManualEntry ? null :  String(session?.user?.id),
     };
 
     const newRegistrationString = JSON.stringify(newRegistrationObject);
