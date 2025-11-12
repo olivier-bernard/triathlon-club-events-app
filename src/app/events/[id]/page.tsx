@@ -162,7 +162,8 @@ export default async function EventDetail(props: EventDetailPageProps) {
                   <RegistrationForm
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
-                    user={null} // Forcing registration for another person
+                    user={null}
+                    lang={lang}
                   />
                 </div>
               </div>
@@ -174,6 +175,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                     eventId={event.id}
                     distanceOptions={event.distanceOptions}
                     user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
+                    lang={lang}
                   />
                 </div>
               </div>

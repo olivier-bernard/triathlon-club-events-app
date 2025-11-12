@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { registerForEvent } from "@/app/events/[id]/actions";
 import { useFormStatus } from "react-dom";
+import { getTranslations } from "@/app/lib/i18n";
 
 interface RegistrationFormProps {
   eventId: string;
@@ -13,6 +14,7 @@ interface RegistrationFormProps {
     email: string;
   } | null;
   defaultToManual?: boolean; // Add this prop
+  lang?: string; // Add language prop
 }
 
 const MANUAL_ENTRY_KEY = "manual";
@@ -30,7 +32,8 @@ function SubmitButton() {
   );
 }
 
-export default function RegistrationForm({ eventId, distanceOptions, user, defaultToManual = false }: RegistrationFormProps) {
+export default function RegistrationForm({ eventId, distanceOptions, user, defaultToManual = false, lang = "fr" }: RegistrationFormProps) {
+  const t = getTranslations(lang).eventRegistration;
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
   const [groupLevel, setGroupLevel] = useState("1");
@@ -63,11 +66,9 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      {message && <p className={message.includes("successful") ? "text-success" : "text-error"}>{message}</p>}
-
       {/* Name Input Section */}
       <div className="form-control">
-        <label className="label"><span className="label-text">Nom</span></label>
+        <label className="label"><span className="label-text">{t.nameLabel}</span></label>
         {user ? (
           <select
             name="nameSelection"
@@ -76,14 +77,14 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
             onChange={(e) => setNameSelection(e.target.value)}
           >
             <option value={user.displayName}>{user.displayName}</option>
-            <option value={MANUAL_ENTRY_KEY}>Entrer manuellement un autre athlète</option>
+            <option value={MANUAL_ENTRY_KEY}>{t.manualEntry}</option>
           </select>
         ) : null}
         {isManualEntry && (
           <input
             type="text"
             name="manualName"
-            placeholder="Prénom et Nom"
+            placeholder={t.nameLabel}
             className="input input-bordered mt-2"
             required
           />
@@ -92,7 +93,7 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
 
       {/* Tour/Distance Selection */}
       <div className="form-control">
-        <label className="label"><span className="label-text">Parcours</span></label>
+        <label className="label"><span className="label-text">{t.parcoursLabel}</span></label>
         <select
           name="tour"
           value={selectedTour}
@@ -108,7 +109,7 @@ export default function RegistrationForm({ eventId, distanceOptions, user, defau
 
       {/* Group Level Selection */}
       <div className="form-control">
-        <label className="label"><span className="label-text">Groupe de niveau</span></label>
+        <label className="label"><span className="label-text">{t.groupLevelLabel}</span></label>
         <select
           name="groupLevel"
           value={groupLevel}

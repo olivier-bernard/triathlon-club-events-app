@@ -135,6 +135,12 @@ type Translations = {
     send: string;
     privateIndicator: string;
   };
+  eventRegistration: {
+    nameLabel: string,
+    manualEntry: string,
+    parcoursLabel: string,
+    groupLevelLabel: string,
+  };
 };
 
 export const translations: Record<string, Translations> = {
@@ -285,6 +291,12 @@ export const translations: Record<string, Translations> = {
       privateNote: "Private Note",
       send: "Send",
       privateIndicator: "Private note",
+    },
+    eventRegistration: {
+      nameLabel: "Name",
+      manualEntry: "Enter another athlete manually",
+      parcoursLabel: "Course",
+      groupLevelLabel: "Group Level",
     }
   },
   fr: {
@@ -434,6 +446,12 @@ export const translations: Record<string, Translations> = {
       privateNote: "Note privée",
       send: "Envoyer",
       privateIndicator: "Note privée",
+    },
+    eventRegistration: {
+      nameLabel: "Nom",
+      manualEntry: "Entrer manuellement un autre athlète",
+      parcoursLabel: "Parcours",
+      groupLevelLabel: "Groupe de niveau",
     }
   },
 };
