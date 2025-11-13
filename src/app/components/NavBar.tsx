@@ -34,7 +34,7 @@ export default async function NavBar() {
             </label>
             <ul
               tabIndex={0}
-              className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+              className="mt-3 z-dropdown p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
                 <Link href="/admin/events/new" className="text-base">{navBar.addEvent}</Link>
@@ -58,7 +58,7 @@ export default async function NavBar() {
           </label>
           <ul
             tabIndex={0}
-            className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+            className="mt-3 z-dropdown p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
           >
             <li className="menu-title">
               <span>{navBar.signedInAs.replace('{username}', session.user?.name || '')}</span>

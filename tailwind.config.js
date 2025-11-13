@@ -3,7 +3,13 @@ import daisyui from "daisyui";
 const config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
-    extend: {},
+    extend: {
+      zIndex: {
+        dropdown: "50",
+        modal: "100",
+        toast: "150",
+      },
+    },
   },
   plugins: [daisyui],
   daisyui: {
