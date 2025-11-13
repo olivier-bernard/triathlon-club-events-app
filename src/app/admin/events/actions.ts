@@ -1,4 +1,3 @@
-export const runtime = "nodejs";
 "use server";
 
 import { PrismaClient } from "@prisma/client";
