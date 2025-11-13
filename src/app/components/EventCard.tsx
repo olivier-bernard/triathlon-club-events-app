@@ -71,19 +71,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin, lang, timeFormat 
           
           <h3 className="text-lg font-bold text-primary truncate pr-8">{event.description}</h3>
 
-          <div className="flex justify-between items-center gap-4">
-            <div className="flex items-center gap-1 text-sm text-base-content/70 flex-shrink-0">
+          <div className="flex justify-between items-center gap-x-1 flex-nowrap whitespace-nowrap">
+            <div className="flex items-center gap-1 text-sm text-base-content/70 flex-shrink">
               <CalendarIcon />
               <span className="font-bold">{dateStr}</span>
               {timeStr && <span>- {timeStr}</span>}
             </div>
-            <div className="flex items-center gap-2">
-              {/* Use the translated value for event type */}
-              <span className={`badge ${event.type === 'COMPETITION' ? 'badge-error text-white font-bold' : 'badge-primary'}`}>
+            <div className="flex items-center gap-x-1 flex-shrink-0">
+              <span className={`badge ${event.type === 'COMPETITION' ? 'badge-error text-white font-bold' : 'badge-primary'} whitespace-nowrap`}>
                 {eventTypeTranslations[event.type] || event.type}
               </span>
-              {/* Use the translated value for event activity */}
-              <span className="badge badge-secondary">
+              <span className="badge badge-secondary whitespace-nowrap">
                 {activityTranslations[event.activity] || event.activity}
               </span>
             </div>
