@@ -10,6 +10,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/register") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/themes") ||
     pathname.startsWith("/api/auth")
   ) {
     return NextResponse.next();
