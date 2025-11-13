@@ -1,13 +1,11 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { db as prisma } from "@/app/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
-
-const prisma = new PrismaClient();
 
 const FormSchema = z.object({
     id: z.string().optional(),

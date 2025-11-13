@@ -4,10 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 import EventForm from "../../EventForm";
-import { PrismaClient } from "@prisma/client";
+import { db as prisma } from "@/app/lib/db";
 import { notFound } from "next/navigation";
-
-const prisma = new PrismaClient();
 
 type EditEventPageProps = {
   params: Promise<{
