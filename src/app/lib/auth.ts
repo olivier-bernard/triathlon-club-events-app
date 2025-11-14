@@ -51,6 +51,40 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // For OAuth providers, check if it's a new user
+      if (account?.provider === "google") {
+        const userExists = await db.user.findUnique({
+          where: { email: user.email ?? undefined },
+        });
+
+        // If the user doesn't exist, it's their first time signing in.
+        // We need to create the user with the required fields.
+        if (!userExists) {
+          if (!user.email) {
+            // This should not happen with Google, but as a safeguard
+            return false;
+          }
+
+          // Generate a unique username from the email
+          let username = user.email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "");
+          let usernameExists = await db.user.findUnique({ where: { username } });
+          while (usernameExists) {
+            const randomSuffix = Math.floor(Math.random() * 1000);
+            username = `${username}${randomSuffix}`;
+            usernameExists = await db.user.findUnique({ where: { username } });
+          }
+
+          // Populate the user object with the required fields before it's saved
+          user.username = username;
+          user.displayName = user.name ?? username; // Use Google name or fallback to username
+          user.roles = ['user']; // Assign a default role
+          user.active = true; // Activate the user by default
+        }
+      }
+      return true; // Continue with the sign-in process
+    },
+
     async jwt({ token, user, trigger, session }) {
       if (user) {
         try {

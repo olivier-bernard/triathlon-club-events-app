@@ -63,19 +63,19 @@ model Session {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  username            String               @unique
-  password            String
-  email               String?               @unique
-  createdAt           DateTime             @default(now())
+  id                  String    @id @default(cuid())
+  username            String    @unique
+  password            String?   
+  email               String?   @unique
+  createdAt           DateTime  @default(now())
   displayName         String
-  roles               String[]             @default(["user"])
-  active              Boolean              @default(true)
-  calendarView        Boolean              @default(false)
+  roles               String[]   @default(["user"])
+  active              Boolean    @default(true)
+  calendarView        Boolean    @default(false)
   emailVerified       DateTime?
   image               String?
-  language            String               @default("fr")
-  timeFormat          Boolean              @default(true) // true = 24h, false = 12h
+  language            String     @default("fr")
+  timeFormat          Boolean    @default(true) // true = 24h, false = 12h
   accounts            Account[]
   Message             Message[]
   passwordResetTokens PasswordResetToken[]
