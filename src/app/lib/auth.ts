@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
           const user = await db.user.findUnique({
             where: { username: credentials.username },
           });
-          if (!user) return null;
+          if (!user || !user.password) return null; // <-- Updated this line
           const passwordMatch = await bcrypt.compare(credentials.password, user.password);
           if (!passwordMatch) return null;
           if (!user.active) return null;
