@@ -2,24 +2,36 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/app/lib/auth";
 import { db } from "@/app/lib/db";
-import { toggleUserActive, deleteUser } from "./actions";
+import { toggleUserActive, deleteUser, toggleUserAdmin } from "./actions";
 import { getTranslations } from "@/app/lib/i18n";
 
-function ToggleActiveForm({ user }: { user: any }) {
-    return (
-        <form action={toggleUserActive}>
-            <input type="hidden" name="userId" value={user.id} />
-            <button type="submit" className="btn btn-ghost btn-xs p-0">
-                <input
-                    type="checkbox"
-                    name="active"
-                    className="toggle toggle-success"
-                    defaultChecked={user.active}
-                    style={{ pointerEvents: "none" }}
-                />
-            </button>
-        </form>
-    );
+function ToggleForm({
+  user,
+  field,
+  checked,
+  action,
+  toggleClass,
+}: {
+  user: any;
+  field: string;
+  checked: boolean;
+  action: (formData: FormData) => Promise<void>;
+  toggleClass: string;
+}) {
+  return (
+    <form action={action}>
+      <input type="hidden" name="userId" value={user.id} />
+      <button type="submit" className="btn btn-ghost btn-xs p-0">
+        <input
+          type="checkbox"
+          name={field}
+          className={toggleClass}
+          defaultChecked={checked}
+          style={{ pointerEvents: "none" }}
+        />
+      </button>
+    </form>
+  );
 }
 
 // Correct the prop type for currentUserId to string
@@ -59,26 +71,41 @@ export default async function AdminUsersPage() {
                 <table className="table w-full">
                     <thead>
                         <tr>
-                            <th>{adminUsers.username}</th>
-                            <th>{adminUsers.displayName}</th>
-                            <th>{adminUsers.email}</th>
-                            <th className="text-center">{adminUsers.active}</th>
-                            <th className="text-center">{adminUsers.delete}</th>
+                            <th className="break-normal max-w-[120px]">{adminUsers.username}</th>
+                            <th className="break-normal max-w-[120px]">{adminUsers.displayName}</th>
+                            <th className="break-all max-w-[160px]">{adminUsers.email}</th>
+                            <th className="text-center break-normal">{adminUsers.active}</th>
+                            <th className="text-center break-normal">{adminUsers.admin}</th>
+                            <th className="text-center break-normal">{adminUsers.delete}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
                             <tr key={user.id}>
-                                <td>{user.username}</td>
-                                <td>{user.displayName}</td>
-                                <td>{user.email}</td>
-                                <td className="text-center">
-                                    <ToggleActiveForm user={user} />
-                                </td>
-                                <td className="text-center">
-                                    {/* Remove the incorrect parseInt */}
-                                    <DeleteUserButton user={user} currentUserId={session.user.id} />
-                                </td>
+                              <td className="whitespace-nowrap max-w-[80px] truncate">{user.username}</td>
+                              <td className="break-normal max-w-[120px]">{user.displayName}</td>
+                              <td className="break-all max-w-[160px]">{user.email}</td>
+                              <td className="text-center whitespace-nowrap">
+                                <ToggleForm
+                                  user={user}
+                                  field="active"
+                                  checked={user.active}
+                                  action={toggleUserActive}
+                                  toggleClass="toggle toggle-success"
+                                />
+                              </td>
+                              <td className="text-center whitespace-nowrap">
+                                <ToggleForm
+                                  user={user}
+                                  field="admin"
+                                  checked={user.roles?.includes("admin")}
+                                  action={toggleUserAdmin}
+                                  toggleClass="toggle toggle-warning"
+                                />
+                              </td>
+                              <td className="text-center whitespace-nowrap">
+                                <DeleteUserButton user={user} currentUserId={session.user.id} />
+                              </td>
                             </tr>
                         ))}
                     </tbody>

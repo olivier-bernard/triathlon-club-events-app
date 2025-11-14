@@ -66,6 +66,7 @@ type Translations = {
     displayName: string;
     email: string;
     active: string;
+    admin: string; // <-- Add this line
     delete: string;
   };
   profilePage: {
@@ -224,6 +225,7 @@ export const translations: Record<string, Translations> = {
       displayName: "Display Name",
       email: "Email",
       active: "Active",
+      admin: "Admin",
       delete: "Delete",
     },
     profilePage: {
@@ -380,6 +382,7 @@ export const translations: Record<string, Translations> = {
       displayName: "Nom d'affichage",
       email: "Email",
       active: "Actif",
+      admin: "Admin",
       delete: "Supprimer",
     },
     profilePage: {
