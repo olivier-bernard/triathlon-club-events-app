@@ -75,9 +75,10 @@ export const authOptions: NextAuthOptions = {
             usernameExists = await db.user.findUnique({ where: { username } });
           }
 
-          // Populate the user object with the required fields before it's saved
+          // Map Google name to displayName and remove name property
           user.username = username;
-          user.displayName = user.name ?? username; // Use Google name or fallback to username
+          user.displayName = user.name ?? username;
+          delete user.name; // <-- Remove the name property
           user.roles = ['user']; // Assign a default role
           user.active = true; // Activate the user by default
         }
