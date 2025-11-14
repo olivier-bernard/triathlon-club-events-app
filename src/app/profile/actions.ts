@@ -53,11 +53,19 @@ export async function changePassword(prevState: any, formData: FormData) {
     return { error: "Passwords do not match." };
   }
 
-  try {AbortController
-    const user = await db.user.findUnique({ where: { id: session.user.id } });
-    if (!user) return { error: "User not found." };
+  // Minimum length check
+  if (!newPassword || newPassword.length < 6) {
+    return { error: "Password must be at least 6 characters." };
+  }
 
-    // This is the logic that securely checks the user's current password.
+  try {
+    const user = await db.user.findUnique({ where: { id: session.user.id } });
+    
+    // Check if user exists and has a password. OAuth users won't have one.
+    if (!user || !user.password) {
+      return { error: "Cannot change password for this account type." };
+    }
+
     const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordCorrect) {
       return { error: "Incorrect current password." };

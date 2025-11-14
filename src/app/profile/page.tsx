@@ -28,7 +28,8 @@ export default async function ProfilePage() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8">{profilePage.title}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:items-start">
         <ProfileInfoForm user={user} lang={lang} />
-        <ChangePasswordForm lang={lang} />
+        {/* Only show the change password form if the user has a password set */}
+        {user.password && <ChangePasswordForm lang={lang} />}
       </div>
     </div>
   );
