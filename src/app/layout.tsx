@@ -18,7 +18,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "./components/NavBar"; // Import the NavBar
-import NextAuthProvider from "./components/NextAuthProvider"; // 1. Import the provider
+import NextAuthProvider from "./components/NextAuthProvider";
+import NotificationManager from "./components/NotificationManager"; // <-- Import the new component
+import { getServerSession } from "next-auth";
+import { authOptions } from "./lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,16 +43,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
-    <html lang="en" data-theme="cupcake">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang={session?.user?.language || 'fr'}>
+      <body>
         <NextAuthProvider>
           <NavBar />
-          <main>{children}</main>
+          {/* Only render the NotificationManager if the user is logged in */}
+          {session && <NotificationManager />}
+          <main className="p-4">{children}</main>
         </NextAuthProvider>
       </body>
     </html>
   );
-} 
+}

@@ -80,7 +80,7 @@ model User {
   Message             Message[]
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
-  subscriptions        PushSubscription[]
+  subscriptions       PushSubscription[]
 }
 
 model PasswordResetToken {

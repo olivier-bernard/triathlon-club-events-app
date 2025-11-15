@@ -37,19 +37,21 @@ export default async function EventDetail(props: EventDetailPageProps) {
   // Create sets of already registered user IDs and names for efficient lookup.
   const registeredUserIds = new Set<string>();
   const registeredNames = new Set<string>();
-  event.attendeesList.forEach(attendeeString => {
-    try {
-      const attendee = JSON.parse(attendeeString);
-      if (attendee.userId) {
-        registeredUserIds.add(attendee.userId);
+  if (event && event.attendeesList) {
+    event.attendeesList.forEach(attendeeString => {
+      try {
+        const attendee = JSON.parse(attendeeString);
+        if (attendee.userId) {
+          registeredUserIds.add(attendee.userId);
+        }
+        if (attendee.name) {
+          registeredNames.add(attendee.name.toLowerCase());
+        }
+      } catch {
+        // Ignore malformed JSON strings in the list
       }
-      if (attendee.name) {
-        registeredNames.add(attendee.name.toLowerCase());
-      }
-    } catch {
-      // Ignore malformed JSON strings in the list
-    }
-  });
+    });
+  }
 
   // Filter the allUsers list to exclude those who are already registered by ID or name.
   const availableUsers = allUsers.filter(user => 

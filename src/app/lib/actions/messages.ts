@@ -57,7 +57,7 @@ export async function createMessage(formData: FormData) {
       url: `/events/${newMessage.eventId}`
     };
 
-    const sendPromises = subscriptions.map(sub => 
+    const sendPromises = subscriptions.map((sub: { endpoint: string; p256dh: string; auth: string }) => 
       webpush.sendNotification({
         endpoint: sub.endpoint,
         keys: { p256dh: sub.p256dh, auth: sub.auth }
