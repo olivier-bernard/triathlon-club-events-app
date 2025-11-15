@@ -138,10 +138,13 @@ type Translations = {
   };
   eventRegistration: {
     nameLabel: string,
-    manualEntry: string,
     parcoursLabel: string,
     groupLevelLabel: string,
     registerButton: string,
+    selectUserPlaceholder: string, 
+    registerMyself: string,
+    registeredUsers: string,
+    manualEntry: string,
   };
 };
 
@@ -301,6 +304,9 @@ export const translations: Record<string, Translations> = {
       parcoursLabel: "Course",
       groupLevelLabel: "Group Level",
       registerButton: "Register",
+      selectUserPlaceholder: "Select a user to register...",
+      registerMyself: "Register myself",
+      registeredUsers: "Registered Users",
     }
   },
   fr: {
@@ -458,6 +464,9 @@ export const translations: Record<string, Translations> = {
       parcoursLabel: "Parcours",
       groupLevelLabel: "Groupe de niveau",
       registerButton: "S'inscrire",
+      selectUserPlaceholder: "Sélectionnez un utilisateur à inscrire...",
+      registerMyself: "M'inscrire",
+      registeredUsers: "Utilisateurs inscrits",
     }
   },
 };

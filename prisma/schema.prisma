@@ -80,6 +80,7 @@ model User {
   Message             Message[]
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
+  subscriptions        PushSubscription[]
 }
 
 model PasswordResetToken {
@@ -100,4 +101,14 @@ model Message {
   userId    String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

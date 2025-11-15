@@ -5,6 +5,11 @@ import { registerForEvent } from "@/app/events/[id]/actions";
 import { useFormStatus } from "react-dom";
 import { getTranslations } from "@/app/lib/i18n";
 
+type AppUser = {
+  id: string;
+  displayName: string | null;
+};
+
 interface RegistrationFormProps {
   eventId: string;
   distanceOptions: string[];
@@ -14,8 +19,9 @@ interface RegistrationFormProps {
     displayName: string;
     email: string;
   } | null;
-  defaultToManual?: boolean; // Add this prop
-  lang?: string; // Add language prop
+  allUsers: AppUser[]; // <-- Add allUsers prop
+  defaultToManual?: boolean;
+  lang?: string;
 }
 
 const MANUAL_ENTRY_KEY = "manual";
@@ -34,18 +40,16 @@ function SubmitButton({ lang }: { lang: string }) {
   );
 }
 
-export default function RegistrationForm({ eventId, distanceOptions, groupList, user, defaultToManual = false, lang = "fr" }: RegistrationFormProps) {
+export default function RegistrationForm({ eventId, distanceOptions, groupList, user, allUsers, defaultToManual = false, lang = "fr" }: RegistrationFormProps) {
   const t = getTranslations(lang).eventRegistration;
   const [message, setMessage] = useState("");
   const [selectedTour, setSelectedTour] = useState(distanceOptions[0] || "");
   const [groupLevel, setGroupLevel] = useState(groupList?.[0] || "-");
   
-  // If user is null, it's always a manual entry.
-  const isForLoggedInUser = user && !defaultToManual;
+  // If the user is logged in, default to registering themself. Otherwise, show the placeholder.
+  const [nameSelection, setNameSelection] = useState(user ? user.id : "");
 
-  const [nameSelection, setNameSelection] = useState(isForLoggedInUser ? user.displayName : MANUAL_ENTRY_KEY);
-
-  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY || !isForLoggedInUser;
+  const isManualEntry = nameSelection === MANUAL_ENTRY_KEY;
 
   async function action(formData: FormData) {
     formData.append("eventId", eventId);
@@ -70,23 +74,27 @@ export default function RegistrationForm({ eventId, distanceOptions, groupList, 
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      {/* This hidden input is crucial. It ensures nameSelection is always submitted. */}
-      <input type="hidden" name="nameSelection" value={nameSelection} />
-
       {/* Name Input Section */}
       <div className="form-control">
         <label className="label"><span className="label-text">{t.nameLabel}</span></label>
-        {isForLoggedInUser ? (
-          <select
-            // The name attribute is removed here to avoid duplicate submission.
-            className="select select-bordered"
-            value={nameSelection}
-            onChange={(e) => setNameSelection(e.target.value)}
-          >
-            <option value={user.displayName}>{user.displayName}</option>
-            <option value={MANUAL_ENTRY_KEY}>{t.manualEntry}</option>
-          </select>
-        ) : null}
+        <select
+          name="nameSelection" // This name is now used to submit the selected userId or "manual"
+          className="select select-bordered"
+          value={nameSelection}
+          onChange={(e) => setNameSelection(e.target.value)}
+          required // Ensure a selection is made
+        >
+          <option value="" disabled>{t.selectUserPlaceholder}</option>
+          {user && <option value={user.id}>{t.registerMyself} ({user.displayName})</option>}
+          <optgroup label={t.registeredUsers}>
+            {/* Filter out the current user from the main list */}
+            {allUsers.filter(u => u.id !== user?.id).map(u => (
+              <option key={u.id} value={u.id}>{u.displayName}</option>
+            ))}
+          </optgroup>
+          <option value={MANUAL_ENTRY_KEY}>{t.manualEntry}</option>
+        </select>
+
         {isManualEntry && (
           <input
             type="text"

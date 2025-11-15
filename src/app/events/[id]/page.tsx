@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { authOptions } from "@/app/lib/auth";
 import { getEventById } from "@/app/lib/queries/events";
+import { getAllUsers } from "@/app/lib/queries/users"; // <-- Import the new query
 import RegistrationForm from "@/app/components/RegistrationForm";
 import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import { getTranslations } from "@/app/lib/i18n";
@@ -29,8 +30,32 @@ export default async function EventDetail(props: EventDetailPageProps) {
   // Fetch data sequentially
   const event = await getEventById(id);
   const session = await getServerSession(authOptions);
+  const allUsers = await getAllUsers(); 
   const userId = session?.user?.id ? String(session.user.id) : undefined;
   const messages = await getMessagesByEventId(id, userId); 
+
+  // Create sets of already registered user IDs and names for efficient lookup.
+  const registeredUserIds = new Set<string>();
+  const registeredNames = new Set<string>();
+  event.attendeesList.forEach(attendeeString => {
+    try {
+      const attendee = JSON.parse(attendeeString);
+      if (attendee.userId) {
+        registeredUserIds.add(attendee.userId);
+      }
+      if (attendee.name) {
+        registeredNames.add(attendee.name.toLowerCase());
+      }
+    } catch {
+      // Ignore malformed JSON strings in the list
+    }
+  });
+
+  // Filter the allUsers list to exclude those who are already registered by ID or name.
+  const availableUsers = allUsers.filter(user => 
+    !registeredUserIds.has(user.id) && 
+    !registeredNames.has(user.displayName?.toLowerCase() || '')
+  );
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
@@ -42,14 +67,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
   }
 
   const isUserRegistered = session?.user
-    ? event.attendeesList.some(attendeeString => {
-      try {
-        const attendee = JSON.parse(attendeeString);
-        return attendee.userId && attendee.userId === session.user.id;
-      } catch {
-        return false;
-      }
-    })
+    ? registeredUserIds.has(session.user.id)
     : false;
 
   // Helper function for border color, updated to use enum keys
@@ -164,6 +182,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                     distanceOptions={event.distanceOptions}
                     groupList={event.groupList}
                     user={null}
+                    allUsers={availableUsers} 
                     lang={lang}
                   />
                 </div>
@@ -177,6 +196,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                     distanceOptions={event.distanceOptions}
                     groupList={event.groupList}
                     user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
+                    allUsers={availableUsers} // <-- Pass filtered users
                     lang={lang}
                   />
                 </div>
