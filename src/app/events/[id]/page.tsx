@@ -198,7 +198,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                     distanceOptions={event.distanceOptions}
                     groupList={event.groupList}
                     user={session?.user ? { id: session.user.id, displayName: session.user.name || "", email: session.user.email || "" } : null}
-                    allUsers={availableUsers} // <-- Pass filtered users
+                    allUsers={availableUsers} 
                     lang={lang}
                   />
                 </div>

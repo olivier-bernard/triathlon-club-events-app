@@ -4,6 +4,7 @@ import { createMessage, getNewerMessages } from "@/app/lib/actions/messages";
 import { PaperAirplaneIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRef, useTransition, useEffect, useState } from "react"; // Import useState
 import ChatLocalTime from "./ChatLocalTime";
+import { usePolling } from "@/app/hooks/usePolling";
 
 // Define the type for a message based on what getMessagesByEventId returns
 type Message = {
@@ -64,24 +65,17 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
     };
   }, []);
 
-  // Polling for new messages, now aware of page visibility
-  useEffect(() => {
-    // Only poll if there are messages AND the page is visible to the user.
-    if (messages.length === 0 || !isPageVisible) {
-      return; 
-    }
-
-    const pollInterval = setInterval(async () => {
-      const lastMessage = messages[messages.length - 1];
-      const newMessages = await getNewerMessages(eventId, lastMessage.createdAt.toString(), currentUserId);
-      if (newMessages.length > 0) {
-        setMessages(prevMessages => [...prevMessages, ...newMessages]);
-      }
-    }, 30000); 
-
-    // Cleanup interval when component unmounts or dependencies change (e.g., page becomes hidden)
-    return () => clearInterval(pollInterval);
-  }, [messages, eventId, currentUserId, isPageVisible]); // Add isPageVisible to dependencies
+  // Replace previous polling useEffect with usePolling
+  usePolling(() => {
+    if (messages.length === 0) return;
+    const lastMessage = messages[messages.length - 1];
+    getNewerMessages(eventId, lastMessage.createdAt.toString(), currentUserId)
+      .then(newMessages => {
+        if (newMessages.length > 0) {
+          setMessages(prevMessages => [...prevMessages, ...newMessages]);
+        }
+      });
+  }, 10000); // Poll every 10 seconds
 
 
   return (

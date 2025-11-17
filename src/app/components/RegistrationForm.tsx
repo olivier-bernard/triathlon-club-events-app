@@ -51,7 +51,7 @@ export default function RegistrationForm({ eventId, distanceOptions, groupList, 
 
   const isManualEntry = nameSelection === MANUAL_ENTRY_KEY;
 
-  async function action(formData: FormData) {
+  async function registerAction(formData: FormData) {
     formData.append("eventId", eventId);
     if (groupList.length === 0) {
       formData.append("groupLevel", "-");
@@ -73,7 +73,7 @@ export default function RegistrationForm({ eventId, distanceOptions, groupList, 
   }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={registerAction} className="flex flex-col gap-4">
       {/* Name Input Section */}
       <div className="form-control">
         <label className="label"><span className="label-text">{t.nameLabel}</span></label>

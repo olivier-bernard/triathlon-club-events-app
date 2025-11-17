@@ -19,9 +19,11 @@ export default function LoginForm({ initialLang, translations }: { initialLang: 
         setT(translations[lang].authPages);
     }, [lang, translations]);
 
-    if (status === "authenticated") {
-        router.replace("/");
-    }
+    useEffect(() => {
+        if (status === "authenticated") {
+            router.replace("/");
+        }
+    }, [status, router]);
 
     return (
         <>

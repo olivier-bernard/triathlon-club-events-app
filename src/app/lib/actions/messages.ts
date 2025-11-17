@@ -29,7 +29,7 @@ export async function createMessage(formData: FormData) {
     throw new Error("Message content and event ID are required.");
   }
 
-  const newMessage = await db.message.create({
+  const newMsg = await db.message.create({
     data: {
       content,
       isPrivate,
@@ -43,18 +43,45 @@ export async function createMessage(formData: FormData) {
     },
   });
 
-  if (newMessage) {
-    const event = await db.event.findUnique({ where: { id: newMessage.eventId } });
-    const recipients = event?.attendeesList.filter(id => id !== newMessage.userId) || [];
+  // --- START: PUSH NOTIFICATION LOGIC ---
+  if (newMsg) {
+    const event = await db.event.findUnique({ 
+      where: { id: newMsg.eventId },
+      select: { activity: true, attendeesList: true } 
+    });
 
-    const subscriptions = await db.PushSubscription.findMany({
-      where: { userId: { in: recipients } },
+    // Get user IDs from the attendeesList JSON strings
+    const recipientUserIds = event?.attendeesList
+      .map(attendeeString => {
+        try {
+          const attendee = JSON.parse(attendeeString);
+          return attendee.userId;
+        } catch {
+          return null;
+        }
+      })
+      .filter((id): id is string => id !== null && id !== newMsg.userId) || [];
+
+    // --- Create DB Notifications ---
+    if (recipientUserIds.length > 0) {
+      await db.notification.createMany({
+        data: recipientUserIds.map(userId => ({
+          userId: userId,
+          messageId: newMsg.id,
+        })),
+        skipDuplicates: true, // In case a notification already exists
+      });
+    }
+
+    // --- Send Web Push Notifications ---
+    const subscriptions = await db.pushSubscription.findMany({
+      where: { userId: { in: recipientUserIds } },
     });
 
     const notificationPayload = {
       title: `New message in ${event?.activity}`,
-      body: `${newMessage.user.displayName}: ${newMessage.content.substring(0, 100)}`,
-      url: `/events/${newMessage.eventId}`
+      body: `${newMsg.user.displayName}: ${newMsg.content.substring(0, 100)}`,
+      url: `/events/${newMsg.eventId}`
     };
 
     const sendPromises = subscriptions.map((sub: { endpoint: string; p256dh: string; auth: string }) => 
@@ -71,7 +98,7 @@ export async function createMessage(formData: FormData) {
   }
 
   revalidatePath(`/events/${eventId}`);
-  return JSON.parse(JSON.stringify(newMessage)); // Ensure it's serializable for client
+  return JSON.parse(JSON.stringify(newMsg)); // Ensure it's serializable for client
 }
 
 export async function getNewerMessages(eventId: string, lastMessageDate: string, currentUserId?: string) {

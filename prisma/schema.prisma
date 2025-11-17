@@ -81,6 +81,7 @@ model User {
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
   subscriptions       PushSubscription[]
+  notifications        Notification[]
 }
 
 model PasswordResetToken {
@@ -93,14 +94,15 @@ model PasswordResetToken {
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  content   String
-  isPrivate Boolean  @default(false)
-  createdAt DateTime @default(now())
-  eventId   String
-  userId    String
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String         @id @default(cuid())
+  content       String
+  createdAt     DateTime       @default(now())
+  isPrivate     Boolean        @default(false)
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId       String
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  notifications Notification[]
 }
 
 model PushSubscription {
@@ -111,4 +113,18 @@ model PushSubscription {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, messageId]) // A user can only have one notification per message
 }

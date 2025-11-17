@@ -22,6 +22,7 @@ import NextAuthProvider from "./components/NextAuthProvider";
 import NotificationManager from "./components/NotificationManager"; // <-- Import the new component
 import { getServerSession } from "next-auth";
 import { authOptions } from "./lib/auth";
+import { NotificationProvider } from './components/NotificationContext'; // <-- Import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,10 +50,11 @@ export default async function RootLayout({
     <html lang={session?.user?.language || 'fr'}>
       <body>
         <NextAuthProvider>
-          <NavBar />
-          {/* Only render the NotificationManager if the user is logged in */}
-          {session && <NotificationManager />}
-          <main className="p-4">{children}</main>
+          <NotificationProvider> 
+            <NavBar />
+            {session && <NotificationManager />}
+            <main className="p-4">{children}</main>
+          </NotificationProvider> 
         </NextAuthProvider>
       </body>
     </html>
