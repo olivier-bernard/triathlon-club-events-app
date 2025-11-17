@@ -23,6 +23,7 @@ import NotificationManager from "./components/NotificationManager"; // <-- Impor
 import { getServerSession } from "next-auth";
 import { authOptions } from "./lib/auth";
 import { NotificationProvider } from './components/NotificationContext'; // <-- Import
+import InstallPrompt from "./components/InstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,21 +40,21 @@ export const metadata: Metadata = {
   description: "A platform to view and register for cycling training events",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
   return (
     <html lang={session?.user?.language || 'fr'}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body>
         <NextAuthProvider>
           <NotificationProvider> 
             <NavBar />
             {session && <NotificationManager />}
             <main className="p-4">{children}</main>
+            <InstallPrompt />
           </NotificationProvider> 
         </NextAuthProvider>
       </body>

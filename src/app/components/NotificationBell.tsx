@@ -5,6 +5,7 @@ import { useNotifications, UINotification } from './NotificationContext';
 import { getUnreadNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
 import Link from 'next/link';
 import { usePolling } from "@/app/hooks/usePolling";
+import { useRouter } from 'next/navigation';
 
 // A simple Bell icon component
 function BellIcon({ count }: { count: number }) {
@@ -20,34 +21,38 @@ function BellIcon({ count }: { count: number }) {
 
 export default function NotificationBell() {
   const { notifications, setNotifications } = useNotifications();
+  const router = useRouter();
 
   usePolling(() => {
     getUnreadNotifications().then(fetched => setNotifications(fetched as UINotification[]));
-  }, 10000); // Poll every 10 seconds
+  }, 10000);
 
-  const handleDropdownOpen = async () => {
-    if (notifications.length === 0) return;
-    
-    const notificationIds = notifications.map(n => n.id);
-    await markNotificationsAsRead(notificationIds);
-    
-    // Optimistically clear the count in the UI
-    setNotifications([]);
+  // Remove handleDropdownOpen, and instead handle per-message click
+  const handleNotificationClick = async (notif: UINotification) => {
+    // Mark only this notification as read
+    await markNotificationsAsRead([notif.id]);
+    // Remove it from the context
+    setNotifications(notifications.filter(n => n.id !== notif.id));
+    // Navigate to the event
+    router.push(`/events/${notif.message.event.id}`);
   };
 
   return (
     <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle" onClick={handleDropdownOpen}>
+      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
         <BellIcon count={notifications.length} />
       </div>
       <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-80">
         {notifications.length > 0 ? (
           notifications.map(notif => (
             <li key={notif.id}>
-              <Link href={`/events/${notif.message.event.id}`} className="whitespace-normal">
+              <button
+                className="whitespace-normal w-full text-left"
+                onClick={() => handleNotificationClick(notif)}
+              >
                 <div className="font-bold">{notif.message.event.activity}</div>
                 <div className="text-sm opacity-80">{notif.message.user.displayName}: "{notif.message.content.substring(0, 40)}..."</div>
-              </Link>
+              </button>
             </li>
           ))
         ) : (

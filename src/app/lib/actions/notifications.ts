@@ -74,3 +74,26 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
         },
     });
 }
+
+export async function markNotificationsAsReadForEvent(userId: string, eventId: string) {
+  // Find all unread notifications for this user and event
+  const notifications = await db.notification.findMany({
+    where: {
+      userId,
+      isRead: false,
+      message: {
+        eventId,
+      },
+    },
+    select: { id: true },
+  });
+
+  if (notifications.length > 0) {
+    await db.notification.updateMany({
+      where: {
+        id: { in: notifications.map(n => n.id) },
+      },
+      data: { isRead: true },
+    });
+  }
+}

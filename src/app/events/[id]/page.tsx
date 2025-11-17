@@ -19,6 +19,8 @@ import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import { getTranslations } from "@/app/lib/i18n";
 import EventChat from "@/app/components/EventChat";
 import { getMessagesByEventId } from "@/app/lib/queries/messages";
+import { markNotificationsAsRead, markNotificationsAsReadForEvent } from "@/app/lib/actions/notifications";
+import { useNotifications } from "@/app/components/NotificationContext";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
@@ -33,6 +35,11 @@ export default async function EventDetail(props: EventDetailPageProps) {
   const allUsers = await getAllUsers(); 
   const userId = session?.user?.id ? String(session.user.id) : undefined;
   const messages = await getMessagesByEventId(id, userId); 
+
+  // Mark notifications as read for this event for the current user
+  if (userId) {
+    await markNotificationsAsReadForEvent(userId, id);
+  }
 
   // Create sets of already registered user IDs and names for efficient lookup.
   const registeredUserIds = new Set<string>();
@@ -79,7 +86,6 @@ export default async function EventDetail(props: EventDetailPageProps) {
     if (event.type === 'TRAINING') return 'border-green-500';
     return 'border-transparent';
   };
-
 
   return (
     <div className="container mx-auto p-4 md:p-8">

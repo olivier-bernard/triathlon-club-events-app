@@ -15,7 +15,7 @@ type Track = {
 type EventFormProps = {
     event?: Event | null;
     lang: string;
-    timeFormat: boolean; // <-- Add this prop
+    timeFormat: boolean; 
 };
 
 export default function EventForm({ event, lang, timeFormat }: EventFormProps) {

@@ -55,21 +55,24 @@ export async function createMessage(formData: FormData) {
       .map(attendeeString => {
         try {
           const attendee = JSON.parse(attendeeString);
-          return attendee.userId;
+          // Only include valid user IDs (registered platform users, not manual entries)
+          return typeof attendee.userId === "string" && attendee.userId !== newMsg.userId
+            ? attendee.userId
+            : null;
         } catch {
           return null;
         }
       })
-      .filter((id): id is string => id !== null && id !== newMsg.userId) || [];
+      .filter((id): id is string => !!id) || [];
 
     // --- Create DB Notifications ---
     if (recipientUserIds.length > 0) {
       await db.notification.createMany({
         data: recipientUserIds.map(userId => ({
-          userId: userId,
+          userId,
           messageId: newMsg.id,
         })),
-        skipDuplicates: true, // In case a notification already exists
+        skipDuplicates: true,
       });
     }
 
