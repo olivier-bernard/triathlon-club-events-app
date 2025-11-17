@@ -25,7 +25,7 @@ export default function NotificationBell() {
 
   usePolling(() => {
     getUnreadNotifications().then(fetched => setNotifications(fetched as UINotification[]));
-  }, 10000);
+  }, 60000);
 
   // Remove handleDropdownOpen, and instead handle per-message click
   const handleNotificationClick = async (notif: UINotification) => {

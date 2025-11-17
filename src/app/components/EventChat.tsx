@@ -75,7 +75,7 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
           setMessages(prevMessages => [...prevMessages, ...newMessages]);
         }
       });
-  }, 10000); // Poll every 10 seconds
+  }, 30000); // Poll every 10 seconds
 
 
   return (
