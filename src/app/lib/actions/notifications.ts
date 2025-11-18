@@ -30,7 +30,6 @@ export async function saveSubscription(subscription: {
 // This action will fetch all unread notifications for the logged-in user.
 export async function getUnreadNotifications() {
   const session = await getServerSession(authOptions);
-  console.log("Fetching unread notifications for user:", session?.user?.id);
   if (!session?.user?.id) {
     return [];
   }
@@ -56,7 +55,6 @@ export async function getUnreadNotifications() {
       createdAt: 'desc',
     },
   });
-  console.log("Fetched unread notifications:", notifications);
 
   return notifications;
 }

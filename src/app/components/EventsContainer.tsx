@@ -14,7 +14,7 @@ type EventsContainerProps = {
   isAdmin: boolean;
   initialView: 'list' | 'calendar';
   lang: string;
-  timeFormat: boolean; // <-- Add this prop
+  timeFormat: boolean;
 };
 
 export default function EventsContainer({ initialEvents, isAdmin, initialView, lang, timeFormat }: EventsContainerProps) {

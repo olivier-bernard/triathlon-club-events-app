@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Calendar from "react-calendar";
 import "@/app/calendar.css";
@@ -11,7 +11,31 @@ import { getTranslations } from "../lib/i18n"; // Import translations
 // Update props to accept lang
 export default function EventCalendar({ events, isAdmin, lang, timeFormat }: { events: Event[], isAdmin: boolean, lang: string, timeFormat: boolean }) {
   const [activeDate, setActiveDate] = useState(new Date());
+  const touchStartX = useRef<number | null>(null);
   const { calendar } = getTranslations(lang); 
+
+  // Swipe handlers
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX.current;
+    if (Math.abs(diff) > 50) { // Minimum swipe distance
+      const newDate = new Date(activeDate);
+      if (diff < 0) {
+        // Swipe left: next month
+        newDate.setMonth(newDate.getMonth() + 1);
+      } else {
+        // Swipe right: previous month
+        newDate.setMonth(newDate.getMonth() - 1);
+      }
+      setActiveDate(newDate);
+    }
+    touchStartX.current = null;
+  }
 
   // --- Helper functions ---
   function getEventsForDate(date: Date) {
@@ -56,7 +80,10 @@ export default function EventCalendar({ events, isAdmin, lang, timeFormat }: { e
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
-    <div>
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* The Calendar itself */}
       <div className="bg-base-100 rounded-xl shadow p-2">
         <Calendar
