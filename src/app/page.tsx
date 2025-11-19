@@ -18,7 +18,7 @@ import Link from "next/link";
 import { authOptions } from "@/app/lib/auth";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { getTranslations } from "./lib/i18n";
-import { AllIcon, BikeIcon, TrophyIcon } from "./components/icons/icons";
+import { AllIcon, BikeIcon, TrophyIcon, SwimIcon } from "./components/icons/icons";
 
 export const dynamic = 'force-dynamic';
 
@@ -47,11 +47,21 @@ export default async function HomePage() {
           <AllIcon className="h-8 w-8 mr-3" />
           {homePage.allEvents}
         </Link>
-        <Link href="/events?activity=CYCLING" className="btn btn-secondary btn-lg text-xl h-20">
+        <Link
+          href="/events?activity=CYCLING"
+          className="btn btn-lg text-xl h-20 bg-green-200 text-green-800 hover:bg-green-300 border-none dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-800"
+        >
           <BikeIcon className="h-8 w-8 mr-3" />
           {homePage.cycling}
         </Link>
-        <Link href="/events?type=COMPETITION" className="btn btn-accent btn-lg text-xl h-20">
+        <Link href="/events?activity=NATATION" className="btn btn-info btn-lg text-xl h-20">
+          <SwimIcon className="h-8 w-8 mr-3" />
+          {homePage.natation}
+        </Link>
+        <Link
+          href="/events?type=COMPETITION"
+          className="btn btn-lg text-xl h-20 bg-red-500 text-white hover:bg-red-600 border-none dark:bg-red-700 dark:text-white dark:hover:bg-red-800"
+        >
           <TrophyIcon className="h-8 w-8 mr-3" />
           {homePage.competitions}
         </Link>

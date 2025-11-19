@@ -36,3 +36,29 @@ export const TrophyIcon = ({ className }: IconProps) => (
         <path d="M280-120v-80h160v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80v-80h400v80h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h160v80H280Zm0-408v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z" />
     </svg>
 );
+
+export const SwimIcon = ({ className }: IconProps) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        className={className}
+        fill="currentColor"
+    >
+        {/* Waves */}
+        <path
+            d="M2 18c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            fill="none"
+        />
+        {/* Swimmer's arm */}
+        <path
+            d="M8 10c1.5-2 4.5-2 6 0"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            fill="none"
+        />
+        {/* Swimmer's head */}
+        <circle cx="14" cy="10" r="1" fill="currentColor" />
+    </svg>
+);

@@ -17,6 +17,8 @@ type Translations = {
     allEvents: string;
     cycling: string;
     competitions: string;
+    natation?: string;
+    noNotifications?: string; 
   };
   calendar: {
     weekOf: string;
@@ -66,7 +68,7 @@ type Translations = {
     displayName: string;
     email: string;
     active: string;
-    admin: string; // <-- Add this line
+    admin: string; 
     delete: string;
   };
   profilePage: {
@@ -178,7 +180,9 @@ export const translations: Record<string, Translations> = {
       createEvent: "Create Event",
       allEvents: "All Events",
       cycling: "Cycling",
+      natation: "Swimming",
       competitions: "Competitions",
+      noNotifications: "No new notifications",
     },
     calendar: {
       weekOf: "Week of",
@@ -338,7 +342,9 @@ export const translations: Record<string, Translations> = {
       createEvent: "Créer un événement",
       allEvents: "Tous les événements",
       cycling: "Cyclisme",
+      natation: "Natation",
       competitions: "Compétitions",
+      noNotifications: "Aucune nouvelle notification",
     },
     calendar: {
       weekOf: "Semaine du",

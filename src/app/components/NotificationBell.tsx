@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useNotifications, UINotification } from './NotificationContext';
 import { getUnreadNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
-import Link from 'next/link';
 import { usePolling } from "@/app/hooks/usePolling";
 import { useRouter } from 'next/navigation';
+import { getTranslations } from "@/app/lib/i18n";
+
+const lang = typeof window !== "undefined" ? window.navigator.language.slice(0,2) : "en";
+const t = getTranslations(lang);
 
 // A simple Bell icon component
 function BellIcon({ count }: { count: number }) {
@@ -56,7 +58,7 @@ export default function NotificationBell() {
             </li>
           ))
         ) : (
-          <li className="p-2">No new notifications</li>
+          <li className="p-2">{t.homePage.noNotifications || "No new notifications"}</li>
         )}
       </ul>
     </div>
