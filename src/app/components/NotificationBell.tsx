@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNotifications, UINotification } from './NotificationContext';
 import { getNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
 import { useRouter } from 'next/navigation';
@@ -20,12 +20,21 @@ function BellIcon({ count }: { count: number }) {
   );
 }
 
-export default function NotificationBell({ lang, onMessageClick }: { lang?: string, onMessageClick?: () => void }) {
+export default function NotificationBell({
+  lang,
+  open,
+  setOpen,
+  onMessageClick,
+}: {
+  lang?: string,
+  open: boolean,
+  setOpen: (open: boolean) => void,
+  onMessageClick?: () => void
+}) {
   const { notifications, setNotifications } = useNotifications();
   const router = useRouter();
   const t = getTranslations(lang ?? "fr");
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
-  const [open, setOpen] = useState(false);
 
   // Initial fetch on mount
   useEffect(() => {
@@ -70,7 +79,7 @@ export default function NotificationBell({ lang, onMessageClick }: { lang?: stri
     // Remove it from the context
     setNotifications(notifications.filter(n => n.id !== notif.id));
     // Navigate to the event
-    if (onMessageClick) onMessageClick(); 
+    if (onMessageClick) onMessageClick();
     router.push(`/events/${notif.message.event.id}`);
   };
 
@@ -80,7 +89,7 @@ export default function NotificationBell({ lang, onMessageClick }: { lang?: stri
         tabIndex={0}
         role="button"
         className="btn btn-ghost btn-circle"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setOpen(!open)}
       >
         <BellIcon count={notifications.filter(n => n.isRead === false).length} />
       </div>

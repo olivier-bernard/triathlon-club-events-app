@@ -37,7 +37,12 @@ export default function ClientNavBar({ session }: { session: Session }) {
                 className="btn btn-ghost btn-circle"
                 onClick={() => setOpenMenu(openMenu === "notifications" ? null : "notifications")}
               >
-                <NotificationBell lang={lang} onMessageClick={() => setOpenMenu(null)} />
+                <NotificationBell
+                  lang={lang}
+                  open={openMenu === "notifications"}
+                  setOpen={open => setOpenMenu(open ? "notifications" : null)}
+                  onMessageClick={() => setOpenMenu(null)}
+                />
               </div>
               {openMenu === "notifications" && (
                 <ul className="mt-3 z-dropdown p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-80">
