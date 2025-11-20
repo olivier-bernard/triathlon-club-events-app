@@ -66,7 +66,6 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
-  console.log("Language in EventDetail:", lang);
   const timeFormat = session?.user?.timeFormat ?? true;
   const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 

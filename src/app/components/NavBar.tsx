@@ -28,7 +28,7 @@ export default async function NavBar() {
       <div className="flex-none gap-2">
         {session?.user && (
           <>
-            <NotificationBell /> {/* <-- Add the component here */}
+            <NotificationBell lang={lang} /> 
             <div className="dropdown dropdown-end">
               {/* ... existing user dropdown ... */}
             </div>

@@ -30,7 +30,7 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col justify-center items-center h-full flex-grow">
-      
+
       {/* Admin "Create Event" Button at the top */}
       {isAdmin && (
         <div className="w-full flex justify-center mb-12">
@@ -42,29 +42,31 @@ export default async function HomePage() {
       )}
 
       {/* Main Navigation Buttons */}
-      <div className="w-full md:w-auto flex flex-col md:flex-row gap-6 md:gap-10">
-        <Link href="/events" className="btn btn-primary btn-lg text-xl h-20">
-          <AllIcon className="h-8 w-8 mr-3" />
-          {homePage.allEvents}
-        </Link>
-        <Link
-          href="/events?activity=CYCLING"
-          className="btn btn-lg text-xl h-20 bg-green-200 text-green-800 hover:bg-green-300 border-none dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-800"
-        >
-          <BikeIcon className="h-8 w-8 mr-3" />
-          {homePage.cycling}
-        </Link>
-        <Link href="/events?activity=NATATION" className="btn btn-info btn-lg text-xl h-20">
-          <SwimIcon className="h-8 w-8 mr-3" />
-          {homePage.natation}
-        </Link>
-        <Link
-          href="/events?type=COMPETITION"
-          className="btn btn-lg text-xl h-20 bg-red-500 text-white hover:bg-red-600 border-none dark:bg-red-700 dark:text-white dark:hover:bg-red-800"
-        >
-          <TrophyIcon className="h-8 w-8 mr-3" />
-          {homePage.competitions}
-        </Link>
+      <div className="w-full flex flex-col items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-xl">
+          <Link href="/events" className="btn btn-primary btn-lg text-xl h-20">
+            <AllIcon className="h-8 w-8 mr-3" />
+            {homePage.allEvents}
+          </Link>
+          <Link
+            href="/events?activity=CYCLING"
+            className="btn btn-lg text-xl h-20 bg-green-200 text-green-800 hover:bg-green-300 border-none dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-800"
+          >
+            <BikeIcon className="h-8 w-8 mr-3" />
+            {homePage.cycling}
+          </Link>
+          <Link href="/events?activity=NATATION" className="btn btn-info btn-lg text-xl h-20">
+            <SwimIcon className="h-8 w-8 mr-3" />
+            {homePage.natation}
+          </Link>
+          <Link
+            href="/events?type=COMPETITION"
+            className="btn btn-lg text-xl h-20 bg-red-500 text-white hover:bg-red-600 border-none dark:bg-red-700 dark:text-white dark:hover:bg-red-800"
+          >
+            <TrophyIcon className="h-8 w-8 mr-3" />
+            {homePage.competitions}
+          </Link>
+        </div>
       </div>
     </div>
   );

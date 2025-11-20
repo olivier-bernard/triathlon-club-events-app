@@ -121,7 +121,6 @@ function ChatMessage({ message, currentUserId, translations, timeFormat, lang }:
   const isCurrentUser = message.user.id === currentUserId;
   const chatAlignment = isCurrentUser ? "chat-end" : "chat-start";
   const bubbleColor = isCurrentUser ? "chat-bubble-primary" : "chat-bubble bg-base-300";
-  console.log("Language in ChatMessage:", lang);
 
   return (
     <div className={`chat ${chatAlignment}`}>

@@ -6,8 +6,7 @@ import { usePolling } from "@/app/hooks/usePolling";
 import { useRouter } from 'next/navigation';
 import { getTranslations } from "@/app/lib/i18n";
 
-const lang = typeof window !== "undefined" ? window.navigator.language.slice(0,2) : "en";
-const t = getTranslations(lang);
+const lang = typeof window !== "undefined" ? window.navigator.language.slice(0, 2) : "en";
 
 // A simple Bell icon component
 function BellIcon({ count }: { count: number }) {
@@ -21,9 +20,10 @@ function BellIcon({ count }: { count: number }) {
   );
 }
 
-export default function NotificationBell() {
+export default function NotificationBell({ lang }: { lang?: string }) {
   const { notifications, setNotifications } = useNotifications();
   const router = useRouter();
+  const t = getTranslations(lang ?? "fr");
 
   usePolling(() => {
     getNotifications().then(fetched => setNotifications(fetched as UINotification[]));
@@ -52,7 +52,10 @@ export default function NotificationBell() {
             return (
               <li key={notif.id}>
                 <button
-                  className={`whitespace-normal w-full text-left ${isUnread ? "bg-green-50" : "bg-black text-white"}`}
+                  className={`whitespace-normal w-full text-left ${isUnread
+                      ? "bg-green-50"
+                      : "bg-white text-black dark:bg-gray-900 dark:text-white"
+                    }`}
                   onClick={() => handleNotificationClick(notif)}
                 >
                   <div className="font-bold">{notif.message.event.activity}</div>
