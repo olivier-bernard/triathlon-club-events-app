@@ -87,31 +87,31 @@ export async function getNotifications() {
     },
   });
 
-  //console.log('Fetched notifications:', notifications, 'for user:', session.user.id);
-  console.log('Fetched notifications for user : ', session.user.id);
-  // display the number of notification, the number of unread notifications and the number of read notifications : 
-  const totalNotifications = notifications.length;
-  const unreadNotifications = notifications.filter(n => !n.isRead).length;
-  const readNotifications = notifications.filter(n => n.isRead).length;
-  console.log(`Total: ${totalNotifications}, Unread: ${unreadNotifications}, Read: ${readNotifications}`);
+  const cutoff = new Date(Date.now() - 48 * 3600 * 1000);
+  await db.notification.deleteMany({
+    where: {
+      userId: session.user.id,
+      createdAt: { lt: cutoff },
+    },
+  });
 
   return notifications;
 }
 
 // This action will mark notifications as read.
 export async function markNotificationsAsRead(notificationIds: string[]) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return;
 
-    await db.notification.updateMany({
-        where: {
-            id: { in: notificationIds },
-            userId: session.user.id, // Ensure users can only mark their own notifications
-        },
-        data: {
-            isRead: true,
-        },
-    });
+  await db.notification.updateMany({
+    where: {
+      id: { in: notificationIds },
+      userId: session.user.id, // Ensure users can only mark their own notifications
+    },
+    data: {
+      isRead: true,
+    },
+  });
 }
 
 export async function markNotificationsAsReadForEvent(userId: string, eventId: string) {
