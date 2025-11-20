@@ -34,11 +34,12 @@ interface EventChatProps {
   currentUserId?: string;
   initialMessages: Message[];
   translations: ChatTranslations;
-  timeFormat: boolean; 
+  timeFormat: boolean;
+  lang?: string;
 }
 
 // Main Chat Component
-export default function EventChat({ eventId, currentUserId, initialMessages, translations, timeFormat }: EventChatProps) {
+export default function EventChat({ eventId, currentUserId, initialMessages, translations, timeFormat, lang }: EventChatProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const hasMessages = messages.length > 0;
@@ -96,6 +97,7 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
                   currentUserId={currentUserId}
                   translations={translations}
                   timeFormat={timeFormat}
+                  lang={lang}
                 />
               ))}
             </div>
@@ -115,16 +117,17 @@ export default function EventChat({ eventId, currentUserId, initialMessages, tra
 }
 
 // Single Message Component
-function ChatMessage({ message, currentUserId, translations, timeFormat }: { message: Message; currentUserId?: string; translations: ChatTranslations; timeFormat: boolean }) {
+function ChatMessage({ message, currentUserId, translations, timeFormat, lang }: { message: Message; currentUserId?: string; translations: ChatTranslations; timeFormat: boolean, lang?: string }) {
   const isCurrentUser = message.user.id === currentUserId;
   const chatAlignment = isCurrentUser ? "chat-end" : "chat-start";
   const bubbleColor = isCurrentUser ? "chat-bubble-primary" : "chat-bubble bg-base-300";
+  console.log("Language in ChatMessage:", lang);
 
   return (
     <div className={`chat ${chatAlignment}`}>
       <div className="chat-header flex items-center gap-2 pb-1">
         {message.user.displayName}
-        <ChatLocalTime date={message.createdAt.toString()} timeFormat={timeFormat} /> 
+        <ChatLocalTime date={message.createdAt.toString()} timeFormat={timeFormat} lang={lang} /> 
         {message.isPrivate && <LockClosedIcon className="h-3 w-3 text-warning" title={translations.privateIndicator} />}
       </div>
       <div className={`chat-bubble ${bubbleColor} whitespace-pre-line`}>{message.content}</div>

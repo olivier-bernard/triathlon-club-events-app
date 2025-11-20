@@ -7,7 +7,6 @@ import {
   MapPinIcon,
   UsersIcon,
   ClipboardDocumentListIcon,
-  InformationCircleIcon,
   FlagIcon,
   ArrowRightCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -19,8 +18,7 @@ import AttendeesTableClient from "@/app/components/AttendeesTableClient";
 import { getTranslations } from "@/app/lib/i18n";
 import EventChat from "@/app/components/EventChat";
 import { getMessagesByEventId } from "@/app/lib/queries/messages";
-import { markNotificationsAsRead, markNotificationsAsReadForEvent } from "@/app/lib/actions/notifications";
-import { useNotifications } from "@/app/components/NotificationContext";
+import { markNotificationsAsReadForEvent } from "@/app/lib/actions/notifications";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
@@ -68,6 +66,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
 
   const isAdmin = session?.user?.roles?.includes("admin") ?? false;
   const lang = session?.user?.language || 'fr';
+  console.log("Language in EventDetail:", lang);
   const timeFormat = session?.user?.timeFormat ?? true;
   const { eventDetail, eventTypeTranslations, activityTranslations, chat: chatTranslations } = getTranslations(lang);
 
@@ -221,6 +220,7 @@ export default async function EventDetail(props: EventDetailPageProps) {
                 initialMessages={JSON.parse(JSON.stringify(messages))}
                 translations={chatTranslations}
                 timeFormat={timeFormat}
+                lang={lang}
               />
             </div>
           )}

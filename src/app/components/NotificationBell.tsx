@@ -1,7 +1,7 @@
 'use client';
 
 import { useNotifications, UINotification } from './NotificationContext';
-import { getUnreadNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
+import { getNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
 import { usePolling } from "@/app/hooks/usePolling";
 import { useRouter } from 'next/navigation';
 import { getTranslations } from "@/app/lib/i18n";
@@ -26,7 +26,7 @@ export default function NotificationBell() {
   const router = useRouter();
 
   usePolling(() => {
-    getUnreadNotifications().then(fetched => setNotifications(fetched as UINotification[]));
+    getNotifications().then(fetched => setNotifications(fetched as UINotification[]));
   }, 20000);
 
   // Remove handleDropdownOpen, and instead handle per-message click
@@ -46,17 +46,21 @@ export default function NotificationBell() {
       </div>
       <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-80">
         {notifications.length > 0 ? (
-          notifications.map(notif => (
-            <li key={notif.id}>
-              <button
-                className="whitespace-normal w-full text-left"
-                onClick={() => handleNotificationClick(notif)}
-              >
-                <div className="font-bold">{notif.message.event.activity}</div>
-                <div className="text-sm opacity-80">{notif.message.user.displayName}: "{notif.message.content.substring(0, 40)}..."</div>
-              </button>
-            </li>
-          ))
+          notifications.map(notif => {
+            // Light green for unread notifications
+            const isUnread = notif.isRead === false;
+            return (
+              <li key={notif.id}>
+                <button
+                  className={`whitespace-normal w-full text-left ${isUnread ? "bg-green-50" : "bg-black text-white"}`}
+                  onClick={() => handleNotificationClick(notif)}
+                >
+                  <div className="font-bold">{notif.message.event.activity}</div>
+                  <div className="text-sm opacity-80">{notif.message.user.displayName}: "{notif.message.content.substring(0, 40)}..."</div>
+                </button>
+              </li>
+            );
+          })
         ) : (
           <li className="p-2">{t.homePage.noNotifications || "No new notifications"}</li>
         )}

@@ -5,6 +5,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 // Define the shape of a notification for the UI
 export type UINotification = {
   id: string;
+  isRead: boolean;
   message: {
     id: string;
     content: string;

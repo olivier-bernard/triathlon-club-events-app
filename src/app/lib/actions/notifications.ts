@@ -59,6 +59,37 @@ export async function getUnreadNotifications() {
   return notifications;
 }
 
+// This action will fetch all unread notifications for the logged-in user.
+export async function getNotifications() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return [];
+  }
+
+  const notifications = await db.notification.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    include: {
+      message: {
+        include: {
+          user: { // The user who sent the message
+            select: { displayName: true },
+          },
+          event: { // The event the message belongs to
+            select: { id: true, activity: true },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return notifications;
+}
+
 // This action will mark notifications as read.
 export async function markNotificationsAsRead(notificationIds: string[]) {
     const session = await getServerSession(authOptions);
