@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile, email, credentials }) {
       // For OAuth providers, check if it's a new user
       if (account?.provider === "google") {
         const userExists = await db.user.findUnique({
@@ -78,40 +78,47 @@ export const authOptions: NextAuthOptions = {
           // Map Google name to displayName and remove name property
           user.username = username;
           user.displayName = user.name ?? username;
-          delete user.name; // <-- Remove the name property
+          delete user.name; 
           user.roles = ['user']; // Assign a default role
           user.active = true; // Activate the user by default
         }
       }
-      return true; // Continue with the sign-in process
+
+      // Get language from login page (pass it as a query param or in session)
+      const loginLang = typeof credentials?.lang === "string" ? credentials.lang : "fr"; // Ensure string
+
+      // Fetch user from DB
+      let dbUser: any = null;
+      if (typeof user.email === "string" && user.email) {
+        dbUser = await db.user.findUnique({ where: { email: user.email } });
+      } else if (typeof user.username === "string" && user.username) {
+        dbUser = await db.user.findUnique({ where: { username: user.username } });
+      } else if (typeof user.id === "string" && user.id) {
+        dbUser = await db.user.findUnique({ where: { id: user.id } });
+      }
+
+      if (!dbUser) {
+        // First login: set language
+        await db.user.create({
+          data: {
+            ...user,
+            language: loginLang,
+            displayName: typeof user.displayName === "string" ? user.displayName : (user.username ?? "user"),
+          },
+        });
+      } 
+      return true; 
     },
 
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        try {
-          const acceptLanguage = (await headers()).get("accept-language");
-          const preferredLang = acceptLanguage?.split(',')[0].split('-')[0];
-          const supportedLangs = ['en', 'fr'];
-          const langToSet = supportedLangs.includes(preferredLang || '') ? preferredLang : 'en';
-          await db.user.update({
-            where: { id: user.id as string },
-            data: { language: langToSet },
-          });
-          token.language = langToSet;
-        } catch (error) {
-          console.error("Failed to set initial language:", error);
-          token.language = 'fr';
-        }
-      }
-
-      if (user) {
-        token.id = String(user.id); // Ensure id is a string
+        token.id = String(user.id);
         token.name = user.displayName;
         token.email = user.email;
         token.roles = user.roles;
         token.calendarView = user.calendarView;
         token.language = user.language;
-        token.timeFormat = user.timeFormat; // <-- Add this line
+        token.timeFormat = user.timeFormat; 
       }
 
       // Handle session updates (e.g., from useSession().update())
@@ -164,6 +171,19 @@ export const authOptions: NextAuthOptions = {
         session.user.language = token.language as string;
         session.user.timeFormat = token.timeFormat as boolean;
       }
+
+      // Attach language from DB to session
+      let dbUser: any = null;
+      if (typeof session.user.email === "string" && session.user.email) {
+        dbUser = await db.user.findUnique({ where: { email: session.user.email } });
+      } else if (typeof session.user.username === "string" && session.user.username) {
+        dbUser = await db.user.findUnique({ where: { username: session.user.username } });
+      } else if (typeof session.user.id === "string" && session.user.id) {
+        dbUser = await db.user.findUnique({ where: { id: session.user.id } });
+      }
+
+      session.user.language = dbUser?.language || "fr";
+
       return session;
     },
   },

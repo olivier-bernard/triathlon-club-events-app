@@ -11,24 +11,27 @@ export async function updateProfileInfo(prevState: any, formData: FormData) {
   if (!session?.user?.id) return { error: "Not authenticated" };
 
   const displayName = formData.get("displayName") as string;
-  const email = formData.get("email") as string;
-  const language = formData.get("language") as string; // Read the language from the form
-  const timeFormat = formData.get("timeFormat") === "24"; // Read the time format from the form
+  const email = formData.get("email") as string | null;
+  const language = formData.get("language") as string;
+  const timeFormat = formData.get("timeFormat") === "24";
+
+  const updateData: any = {
+    displayName,
+    language,
+    timeFormat,
+  };
+
+  if (email && email.trim() !== "") {
+    updateData.email = email;
+  }
 
   try {
     await db.user.update({
       where: { id: session.user.id },
-      data: {
-        displayName,
-        email,
-        language, 
-        timeFormat 
-      },
+      data: updateData,
     });
-
     revalidatePath("/profile");
-    // We need to revalidate the root layout as well to update the language in the navbar
-    revalidatePath("/"); 
+    revalidatePath("/");
     return { success: "Profile updated successfully!" };
   } catch (error) {
     console.error("Error updating profile:", error);

@@ -58,6 +58,7 @@ export default function LoginForm({ initialLang, translations }: { initialLang: 
                             username: form.username.value,
                             password: form.password.value,
                             callbackUrl: "/",
+                            lang, 
                         });
                     }}
                     className="space-y-4"
