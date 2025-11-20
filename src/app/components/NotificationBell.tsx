@@ -20,7 +20,7 @@ function BellIcon({ count }: { count: number }) {
   );
 }
 
-export default function NotificationBell({ lang }: { lang?: string }) {
+export default function NotificationBell({ lang, onMessageClick }: { lang?: string, onMessageClick?: () => void }) {
   const { notifications, setNotifications } = useNotifications();
   const router = useRouter();
   const t = getTranslations(lang ?? "fr");
@@ -70,6 +70,7 @@ export default function NotificationBell({ lang }: { lang?: string }) {
     // Remove it from the context
     setNotifications(notifications.filter(n => n.id !== notif.id));
     // Navigate to the event
+    if (onMessageClick) onMessageClick(); 
     router.push(`/events/${notif.message.event.id}`);
   };
 
