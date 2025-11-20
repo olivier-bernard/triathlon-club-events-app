@@ -87,6 +87,14 @@ export async function getNotifications() {
     },
   });
 
+  //console.log('Fetched notifications:', notifications, 'for user:', session.user.id);
+  console.log('Fetched notifications for user : ', session.user.id);
+  // display the number of notification, the number of unread notifications and the number of read notifications : 
+  const totalNotifications = notifications.length;
+  const unreadNotifications = notifications.filter(n => !n.isRead).length;
+  const readNotifications = notifications.filter(n => n.isRead).length;
+  console.log(`Total: ${totalNotifications}, Unread: ${unreadNotifications}, Read: ${readNotifications}`);
+
   return notifications;
 }
 

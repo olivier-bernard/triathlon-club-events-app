@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect, useRef, useState } from "react";
 import { useNotifications, UINotification } from './NotificationContext';
 import { getNotifications, markNotificationsAsRead } from '@/app/lib/actions/notifications';
-import { usePolling } from "@/app/hooks/usePolling";
 import { useRouter } from 'next/navigation';
 import { getTranslations } from "@/app/lib/i18n";
 
@@ -24,10 +24,44 @@ export default function NotificationBell({ lang }: { lang?: string }) {
   const { notifications, setNotifications } = useNotifications();
   const router = useRouter();
   const t = getTranslations(lang ?? "fr");
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const [open, setOpen] = useState(false);
 
-  usePolling(() => {
+  // Initial fetch on mount
+  useEffect(() => {
     getNotifications().then(fetched => setNotifications(fetched as UINotification[]));
-  }, 20000);
+  }, []);
+
+  // Polling logic with visibility control
+  useEffect(() => {
+    function startPolling() {
+      // Fetch immediately
+      getNotifications().then(fetched => setNotifications(fetched as UINotification[]));
+      // Start interval
+      pollingRef.current = setInterval(() => {
+        getNotifications().then(fetched => setNotifications(fetched as UINotification[]));
+      }, 20000);
+    }
+    function stopPolling() {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Start polling if visible
+    if (document.visibilityState === "visible") startPolling();
+
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   // Remove handleDropdownOpen, and instead handle per-message click
   const handleNotificationClick = async (notif: UINotification) => {
@@ -41,33 +75,40 @@ export default function NotificationBell({ lang }: { lang?: string }) {
 
   return (
     <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-        <BellIcon count={notifications.length} />
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-ghost btn-circle"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <BellIcon count={notifications.filter(n => n.isRead === false).length} />
       </div>
-      <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-80">
-        {notifications.length > 0 ? (
-          notifications.map(notif => {
-            // Light green for unread notifications
-            const isUnread = notif.isRead === false;
-            return (
-              <li key={notif.id}>
-                <button
-                  className={`whitespace-normal w-full text-left ${isUnread
+      {open && (
+        <ul tabIndex={0} className="mt-3 z-dropdown p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-80">
+          {notifications.length > 0 ? (
+            notifications.map(notif => {
+              // Light green for unread notifications
+              const isUnread = notif.isRead === false;
+              return (
+                <li key={notif.id}>
+                  <button
+                    className={`whitespace-normal w-full text-left ${isUnread
                       ? "bg-green-50"
                       : "bg-white text-black dark:bg-gray-900 dark:text-white"
-                    }`}
-                  onClick={() => handleNotificationClick(notif)}
-                >
-                  <div className="font-bold">{notif.message.event.activity}</div>
-                  <div className="text-sm opacity-80">{notif.message.user.displayName}: "{notif.message.content.substring(0, 40)}..."</div>
-                </button>
-              </li>
-            );
-          })
-        ) : (
-          <li className="p-2">{t.homePage.noNotifications || "No new notifications"}</li>
-        )}
-      </ul>
+                      }`}
+                    onClick={() => handleNotificationClick(notif)}
+                  >
+                    <div className="font-bold">{notif.message.event.activity}</div>
+                    <div className="text-sm opacity-80">{notif.message.user.displayName}: "{notif.message.content.substring(0, 40)}..."</div>
+                  </button>
+                </li>
+              );
+            })
+          ) : (
+            <li className="p-2">{t.homePage.noNotifications || "No new notifications"}</li>
+          )}
+        </ul>
+      )}
     </div>
   );
 }

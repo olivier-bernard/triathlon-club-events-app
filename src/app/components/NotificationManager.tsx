@@ -93,9 +93,6 @@ export default function NotificationManager() {
         // We only want to run this for logged-in users.
         // A simple way is to check if a session-related element exists,
         // or rely on the server action to fail gracefully if not logged in.
-        console.log('Checking for session to setup notifications...');
-        console.log('Navigator:', navigator);
-        console.log('Window:', window);
         setupPushNotifications();
     }, []);
 
