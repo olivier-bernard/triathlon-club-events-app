@@ -11,7 +11,11 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
     pathname.startsWith("/themes") ||
-    pathname.startsWith("/api/auth")
+    pathname.startsWith("/api/auth") ||
+    pathname === "/manifest.json" ||
+    pathname === "/favicon.ico" ||
+    pathname === "/icon-192x192.png" ||
+    pathname === "/icon-512x512.png"
   ) {
     return NextResponse.next();
   }
@@ -32,7 +36,7 @@ export function middleware(request: NextRequest) {
 export { default } from "next-auth/middleware"
 
 export const config = {
-    matcher: [
+  matcher: [
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
